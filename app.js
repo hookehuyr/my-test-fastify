@@ -1,3 +1,10 @@
+/*
+ * @Date: 2025-05-04 22:32:34
+ * @LastEditors: hookehuyr hookehuyr@gmail.com
+ * @LastEditTime: 2025-05-04 23:55:13
+ * @FilePath: /my-test-fastify/app.js
+ * @Description: 文件描述
+ */
 'use strict'
 
 const path = require('node:path')
@@ -23,7 +30,7 @@ module.exports = async function (fastify, opts) {
   // define your routes in one of these
   fastify.register(AutoLoad, {
     dir: path.join(__dirname, 'routes'),
-    options: Object.assign({}, opts)
+    options: Object.assign({ prefix:'/api/v1' }, opts)
   })
 }
 
