@@ -1,7 +1,30 @@
 'use strict'
 
+/**
+ * 购物车管理模块
+ *
+ * 该模块提供购物车的管理功能，包括：
+ * - 添加商品到购物车（需要认证）
+ * - 获取购物车列表（需要认证）
+ * - 更新购物车商品数量（需要认证）
+ * - 从购物车删除商品（需要认证）
+ *
+ * @module routes/cart
+ */
+
 module.exports = async function (fastify, opts) {
-    // 添加商品到购物车
+    /**
+     * 添加商品到购物车
+     *
+     * @route POST /cart
+     * @authentication 需要认证令牌
+     * @param {object} request.body - 购物车商品信息
+     * @param {integer} request.body.product_id - 商品ID
+     * @param {integer} request.body.quantity - 商品数量（必须大于等于1）
+     * @returns {object} 201 - 添加成功消息
+     * @throws {400} - 商品不存在或库存不足
+     * @throws {401} - 未认证
+     */
     fastify.post('/', {
         onRequest: [fastify.authenticate],
         schema: {
@@ -57,7 +80,14 @@ module.exports = async function (fastify, opts) {
         }
     })
 
-    // 获取购物车列表
+    /**
+     * 获取购物车列表
+     *
+     * @route GET /cart
+     * @authentication 需要认证令牌
+     * @returns {Array<object>} 200 - 购物车商品列表，包含商品详细信息
+     * @throws {401} - 未认证
+     */
     fastify.get('/', {
         onRequest: [fastify.authenticate]
     }, async (request, reply) => {
@@ -78,7 +108,19 @@ module.exports = async function (fastify, opts) {
         }
     })
 
-    // 更新购物车商品数量
+    /**
+     * 更新购物车商品数量
+     *
+     * @route PUT /cart/{id}
+     * @authentication 需要认证令牌
+     * @param {integer} request.params.id - 购物车商品ID
+     * @param {object} request.body - 更新信息
+     * @param {integer} request.body.quantity - 新的商品数量（必须大于等于1）
+     * @returns {object} 200 - 更新成功消息
+     * @throws {400} - 商品库存不足
+     * @throws {401} - 未认证
+     * @throws {404} - 购物车商品不存在
+     */
     fastify.put('/:id', {
         onRequest: [fastify.authenticate],
         schema: {
@@ -127,7 +169,16 @@ module.exports = async function (fastify, opts) {
         }
     })
 
-    // 从购物车删除商品
+    /**
+     * 从购物车删除商品
+     *
+     * @route DELETE /cart/{id}
+     * @authentication 需要认证令牌
+     * @param {integer} request.params.id - 购物车商品ID
+     * @returns {object} 200 - 删除成功消息
+     * @throws {401} - 未认证
+     * @throws {404} - 购物车商品不存在
+     */
     fastify.delete('/:id', {
         onRequest: [fastify.authenticate]
     }, async (request, reply) => {

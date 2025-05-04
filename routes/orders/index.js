@@ -1,7 +1,29 @@
 'use strict'
 
+/**
+ * 订单管理模块
+ *
+ * 该模块提供订单的管理功能，包括：
+ * - 创建订单（从购物车商品创建，需要认证）
+ * - 获取订单列表（需要认证）
+ * - 获取订单详情（需要认证）
+ * - 更新订单状态（需要认证）
+ *
+ * @module routes/orders
+ */
+
 module.exports = async function (fastify, opts) {
-    // 创建订单
+    /**
+     * 创建订单
+     *
+     * @route POST /orders
+     * @authentication 需要认证令牌
+     * @param {object} request.body - 订单信息
+     * @param {array<integer>} request.body.cart_items - 购物车商品ID数组（至少包含一个商品）
+     * @returns {object} 201 - 创建成功，返回订单ID和成功消息
+     * @throws {400} - 购物车商品不存在或库存不足
+     * @throws {401} - 未认证
+     */
     fastify.post('/', {
         onRequest: [fastify.authenticate],
         schema: {
@@ -88,7 +110,14 @@ module.exports = async function (fastify, opts) {
         }
     })
 
-    // 获取订单列表
+    /**
+     * 获取当前用户的订单列表
+     *
+     * @route GET /orders
+     * @authentication 需要认证令牌
+     * @returns {Array<object>} 200 - 订单列表数组，包含每个订单的详细商品信息
+     * @throws {401} - 未认证
+     */
     fastify.get('/', {
         onRequest: [fastify.authenticate]
     }, async (request, reply) => {
@@ -119,7 +148,16 @@ module.exports = async function (fastify, opts) {
         }
     })
 
-    // 获取订单详情
+    /**
+     * 获取订单详情
+     *
+     * @route GET /orders/{id}
+     * @authentication 需要认证令牌
+     * @param {integer} request.params.id - 订单ID
+     * @returns {object} 200 - 订单详细信息，包含订单商品列表
+     * @throws {401} - 未认证
+     * @throws {404} - 订单不存在
+     */
     fastify.get('/:id', {
         onRequest: [fastify.authenticate]
     }, async (request, reply) => {
@@ -154,7 +192,18 @@ module.exports = async function (fastify, opts) {
         }
     })
 
-    // 更新订单状态
+    /**
+     * 更新订单状态
+     *
+     * @route PUT /orders/{id}/status
+     * @authentication 需要认证令牌
+     * @param {integer} request.params.id - 订单ID
+     * @param {object} request.body - 更新信息
+     * @param {string} request.body.status - 新的订单状态（paid-已支付, shipped-已发货, delivered-已送达, cancelled-已取消）
+     * @returns {object} 200 - 更新成功消息
+     * @throws {401} - 未认证
+     * @throws {404} - 订单不存在
+     */
     fastify.put('/:id/status', {
         onRequest: [fastify.authenticate],
         schema: {

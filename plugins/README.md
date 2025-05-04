@@ -1,16 +1,11 @@
-# Plugins Folder
+# 插件文件夹
 
-Plugins define behavior that is common to all the routes in your
-application. Authentication, caching, templates, and all the other cross
-cutting concerns should be handled by plugins placed in this folder.
+插件定义了应用程序中所有路由共有的行为。身份验证、缓存、模板，以及所有其他横切关注点都应该由放置在此文件夹中的插件来处理。
 
-Files in this folder are typically defined through the
-[`fastify-plugin`](https://github.com/fastify/fastify-plugin) module,
-making them non-encapsulated. They can define decorators and set hooks
-that will then be used in the rest of your application.
+此文件夹中的文件通常通过 [`fastify-plugin`](https://github.com/fastify/fastify-plugin) 模块来定义，使它们成为非封装的。它们可以定义装饰器并设置钩子，这些装饰器和钩子随后将在应用程序的其余部分中使用。
 
-Check out:
+查看更多：
 
-* [The hitchhiker's guide to plugins](https://fastify.dev/docs/latest/Guides/Plugins-Guide/)
-* [Fastify decorators](https://fastify.dev/docs/latest/Reference/Decorators/).
-* [Fastify lifecycle](https://fastify.dev/docs/latest/Reference/Lifecycle/).
+* [插件使用指南](https://fastify.dev/docs/latest/Guides/Plugins-Guide/)
+* [Fastify 装饰器](https://fastify.dev/docs/latest/Reference/Decorators/)
+* [Fastify 生命周期](https://fastify.dev/docs/latest/Reference/Lifecycle/)

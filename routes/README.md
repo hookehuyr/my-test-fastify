@@ -1,29 +1,29 @@
-# Routes Folder
+# 路由文件夹
 
-Routes define the pathways within your application.
-Fastify's structure supports the modular monolith approach, where your
-application is organized into distinct, self-contained modules.
-This facilitates easier scaling and future transition to a microservice architecture.
-In the future you might want to independently deploy some of those.
+路由定义了应用程序中的访问路径。
+Fastify的结构支持模块化单体架构方法，您的
+应用程序被组织成独立的、自包含的模块。
+这有助于更容易的扩展和未来向微服务架构的转型。
+将来您可能希望独立部署其中的一些模块。
 
-In this folder you should define all the routes that define the endpoints
-of your web application.
-Each service is a [Fastify
-plugin](https://fastify.dev/docs/latest/Reference/Plugins/), it is
-encapsulated (it can have its own independent plugins) and it is
-typically stored in a file; be careful to group your routes logically,
-e.g. all `/users` routes in a `users.js` file. We have added
-a `root.js` file for you with a '/' root added.
+在这个文件夹中，您应该定义所有用于定义Web应用程序
+端点的路由。
+每个服务都是一个[Fastify
+插件](https://fastify.dev/docs/latest/Reference/Plugins/)，它是
+封装的（可以有自己的独立插件），并且
+通常存储在一个文件中；请注意要逻辑地组织您的路由，
+例如，所有 `/users` 路由都放在 `users.js` 文件中。我们已经为您添加了
+一个带有 '/' 根路由的 `root.js` 文件。
 
-If a single file becomes too large, create a folder and add a `index.js` file there:
-this file must be a Fastify plugin, and it will be loaded automatically
-by the application. You can now add as many files as you want inside that folder.
-In this way you can create complex routes within a single monolith,
-and eventually extract them.
+如果单个文件变得太大，可以创建一个文件夹并在其中添加 `index.js` 文件：
+这个文件必须是一个Fastify插件，它将被应用程序
+自动加载。您现在可以在该文件夹中添加任意数量的文件。
+通过这种方式，您可以在单个单体应用中创建复杂的路由，
+并最终将它们提取出来。
 
-If you need to share functionality between routes, place that
-functionality into the `plugins` folder, and share it via
-[decorators](https://fastify.dev/docs/latest/Reference/Decorators/).
+如果您需要在路由之间共享功能，请将该
+功能放入 `plugins` 文件夹中，并通过
+[装饰器](https://fastify.dev/docs/latest/Reference/Decorators/)来共享。
 
-If you're a bit confused about using `async/await` to write routes, you would
-better take a look at [Promise resolution](https://fastify.dev/docs/latest/Reference/Routes/#promise-resolution) for more details.
+如果您对使用 `async/await` 编写路由感到困惑，您最好
+查看[Promise解析](https://fastify.dev/docs/latest/Reference/Routes/#promise-resolution)以了解更多详情。

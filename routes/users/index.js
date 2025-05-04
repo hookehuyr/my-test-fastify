@@ -1,9 +1,30 @@
 'use strict'
 
+/**
+ * 用户管理模块
+ *
+ * 该模块提供用户相关的API接口，包括：
+ * - 用户注册：创建新用户账户
+ * - 用户登录：验证用户身份并生成JWT令牌
+ * - 获取用户信息：获取当前登录用户的详细信息
+ *
+ * @module routes/users
+ * @requires bcryptjs - 用于密码加密和验证
+ */
+
 const bcrypt = require('bcryptjs')
 
 module.exports = async function (fastify, opts) {
-    // 用户注册
+    /**
+     * 用户注册接口
+     *
+     * @route POST /register
+     * @param {string} username - 用户名，至少3个字符
+     * @param {string} password - 密码，至少6个字符
+     * @param {string} email - 有效的电子邮件地址
+     * @returns {object} 包含注册结果的消息
+     * @throws {400} 当用户名或邮箱已存在时
+     */
     fastify.post('/register', {
         schema: {
             body: {
@@ -40,7 +61,15 @@ module.exports = async function (fastify, opts) {
         }
     })
 
-    // 用户登录
+    /**
+     * 用户登录接口
+     *
+     * @route POST /login
+     * @param {string} username - 用户名
+     * @param {string} password - 密码
+     * @returns {object} 包含JWT令牌的对象
+     * @throws {401} 当用户名或密码错误时
+     */
     fastify.post('/login', {
         schema: {
             body: {
@@ -83,7 +112,14 @@ module.exports = async function (fastify, opts) {
         }
     })
 
-    // 获取用户信息
+    /**
+     * 获取当前登录用户信息接口
+     *
+     * @route GET /me
+     * @authentication 需要JWT令牌验证
+     * @returns {object} 用户详细信息（不包含密码）
+     * @throws {404} 当用户不存在时
+     */
     fastify.get('/me', {
         onRequest: [fastify.authenticate]
     }, async (request, reply) => {
