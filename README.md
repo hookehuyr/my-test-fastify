@@ -1,23 +1,37 @@
-# Getting Started with [Fastify-CLI](https://www.npmjs.com/package/fastify-cli)
-This project was bootstrapped with Fastify-CLI.
+我已经为您创建了一个完整的电商API项目，包含以下主要功能模块：
 
-## Available Scripts
+1. 数据库设计与配置
+- 创建了MySQL数据库配置文件，设计了完整的数据库表结构
+- 包含用户、商品、购物车、订单和订单详情等核心表
+- 实现了数据库连接和自动建表功能
+2. 用户管理模块
+- 实现了用户注册功能，支持用户名、密码和邮箱验证
+- 实现了用户登录功能，返回JWT令牌
+- 提供了获取用户信息的接口
+3. 商品管理模块
+- 支持商品的创建、查询、更新和删除
+- 包含商品名称、描述、价格和库存等信息
+- 实现了商品列表和详情查询功能
+4. 购物车模块
+- 支持添加商品到购物车
+- 实现了购物车商品的数量更新
+- 提供购物车列表查询和商品删除功能
+- 包含库存检查逻辑
+5. 订单管理模块
+- 支持从购物车创建订单
+- 实现了订单状态管理（待付款、已付款、已发货、已送达、已取消）
+- 提供订单列表和详情查询功能
+- 包含事务处理确保数据一致性
+6. 安全与认证
+- 使用JWT进行用户认证
+- 实现了密码加密存储
+- 添加了CORS支持
+- 包含统一的认证中间件
+项目使用了以下技术栈：
 
-In the project directory, you can run:
-
-### `npm run dev`
-
-To start the app in dev mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-### `npm start`
-
-For production mode
-
-### `npm run test`
-
-Run the test cases.
-
-## Learn More
-
-To learn Fastify, check out the [Fastify documentation](https://fastify.dev/docs/latest/).
+- Fastify作为Web框架
+- MySQL作为数据库
+- JWT进行身份认证
+- bcrypt进行密码加密
+- CORS支持跨域请求
+注意：项目中的一些配置（如数据库连接信息、JWT密钥等）需要根据实际环境进行调整。建议在生产环境中使用环境变量来管理这些敏感信息。
