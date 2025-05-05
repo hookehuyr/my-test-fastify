@@ -1,7 +1,7 @@
 /*
  * @Date: 2025-05-05 21:02:12
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-05 21:32:22
+ * @LastEditTime: 2025-05-05 22:31:50
  * @FilePath: /my-test-fastify/plugins/error-handler.js
  * @Description: 文件描述
  */
@@ -23,6 +23,21 @@ const fp = require('fastify-plugin')
  * 验证错误消息映射表
  */
 const validationMessages = {
+    username: {
+        minLength: '测试-用户名长度不能少于3个字符',
+        type: '用户名必须是字符串类型',
+        required: '请输入用户名'
+    },
+    password: {
+        minLength: '密码长度不能少于6个字符',
+        type: '密码必须是字符串类型',
+        required: '请输入密码'
+    },
+    email: {
+        format: '请输入有效的电子邮件地址',
+        type: '邮箱必须是字符串类型',
+        required: '请输入邮箱地址'
+    },
     _default: {
         type: '字段类型不正确',
         minLength: '字段长度不能少于{limit}个字符',
@@ -86,8 +101,20 @@ async function errorHandler(fastify, options) {
     fastify.setErrorHandler(function (error, request, reply) {
         // 处理验证错误
         if (error.validation) {
+            const validation = error.validation[0]
+            let field = ''
+
+            // 获取字段名
+            if (validation.instancePath && typeof validation.instancePath === 'string') {
+                field = validation.instancePath.slice(1)
+            } else if (validation.params) {
+                field = validation.params.property || validation.params.missingProperty || '未知字段'
+            } else {
+                field = '未知字段'
+            }
+
             reply.status(400).send({
-                error: getValidationErrorMessage(error)
+                error: `字段 ${field} ${getValidationErrorMessage(error)}`
             })
             return
         }
