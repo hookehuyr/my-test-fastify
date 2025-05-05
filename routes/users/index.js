@@ -116,7 +116,16 @@ module.exports = async function (fastify, opts) {
 
             // 生成JWT令牌
             const token = fastify.jwt.sign({ id: user.id, username: user.username })
-            reply.send({ token })
+
+            // 设置cookie
+            reply.setCookie('token', token, {
+                path: '/',
+                httpOnly: true, // 防止客户端JavaScript访问
+                secure: process.env.NODE_ENV === 'production', // 在生产环境中只通过HTTPS发送
+                sameSite: 'strict' // 防止CSRF攻击
+            })
+
+            reply.send({ message: '登录成功' })
         } finally {
             connection.release()
         }
@@ -132,19 +141,6 @@ module.exports = async function (fastify, opts) {
      */
     fastify.get('/me', {
         onRequest: [fastify.authenticate],
-        schema: {
-            response: {
-                200: {
-                    type: 'object',
-                    properties: {
-                        id: { type:'integer' },
-                        username: { type:'string' },
-                        email: { type:'string' },
-                        created_at: { type:'string', format:'date-time' }
-                    }
-                }
-            }
-        }
     }, async (request, reply) => {
         const connection = await fastify.mysql.getConnection()
         try {

@@ -10,17 +10,19 @@
 const fp = require('fastify-plugin')
 
 /**
- * 认证插件 - 集成JWT身份验证和CORS跨域支持
+ * 认证插件 - 集成JWT身份验证、Cookie支持和CORS跨域支持
  *
  * @module plugins/auth
  * @requires @fastify/jwt - 提供JWT（JSON Web Token）身份验证功能
  * @requires @fastify/cors - 提供跨域资源共享(CORS)支持
+ * @requires @fastify/cookie - 提供Cookie支持
  *
  * @description
  * 该插件为Fastify应用提供了完整的身份验证和授权解决方案：
  * 1. JWT身份验证：用于生成和验证访问令牌
- * 2. CORS配置：启用和配置跨域资源访问
- * 3. 身份验证中间件：提供可重用的身份验证装饰器
+ * 2. Cookie支持：用于管理客户端Cookie
+ * 3. CORS配置：启用和配置跨域资源访问
+ * 4. 身份验证中间件：提供可重用的身份验证装饰器
  *
  * @example
  * // 在路由中使用身份验证装饰器
@@ -31,6 +33,12 @@ const fp = require('fastify-plugin')
  * })
  */
 module.exports = fp(async function (fastify, opts) {
+    // 注册cookie插件
+    await fastify.register(require('@fastify/cookie'), {
+        secret: 'huyirui', // 在生产环境中应该使用环境变量
+        hook: 'onRequest'
+    })
+
     /**
      * 配置并注册JWT插件
      * @description
@@ -41,6 +49,10 @@ module.exports = fp(async function (fastify, opts) {
         secret: 'huyirui', // 在生产环境中应该使用环境变量
         sign: {
             expiresIn: '1d' // Token有效期为1天
+        },
+        cookie: {
+            cookieName: 'token',
+            signed: false
         }
     })
 
@@ -72,7 +84,18 @@ module.exports = fp(async function (fastify, opts) {
         try {
             await request.jwtVerify()
         } catch (err) {
-            reply.code(401).send({ error: '未授权访问' })
+            // 尝试从cookie中获取token
+            const token = request.cookies.token
+            if (token) {
+                try {
+                    const decoded = await fastify.jwt.verify(token)
+                    request.user = decoded
+                } catch (cookieErr) {
+                    reply.code(401).send({ error: '未授权访问' })
+                }
+            } else {
+                reply.code(401).send({ error: '未授权访问' })
+            }
         }
     })
 })
