@@ -3,7 +3,7 @@
  * @LastEditors: hookehuyr hookehuyr@gmail.com
  * @LastEditTime: 2025-05-05 22:31:50
  * @FilePath: /my-test-fastify/plugins/error-handler.js
- * @Description: 文件描述
+ * @Description: 全局错误处理插件，提供统一的错误处理和友好的错误提示
  */
 'use strict'
 
@@ -11,16 +11,26 @@
  * 错误处理器插件
  *
  * 该插件提供全局错误处理功能，主要用于：
- * - 统一处理验证错误
+ * - 统一处理验证错误，包括字段类型、长度、格式等验证
  * - 转换错误消息为用户友好的中文提示
+ * - 支持自定义字段错误消息和默认错误消息
+ * - 处理常见的HTTP 400错误响应
  *
  * @module plugins/error-handler
+ * @requires fastify-plugin
  */
 
 const fp = require('fastify-plugin')
 
 /**
  * 验证错误消息映射表
+ *
+ * @type {Object.<string, Object.<string, string>>}
+ * @description 定义了各个字段的验证错误消息模板，包括：
+ * - username: 用户名相关的验证错误消息
+ * - password: 密码相关的验证错误消息
+ * - email: 邮箱相关的验证错误消息
+ * - _default: 默认的验证错误消息，用于未特别定义的字段
  */
 const validationMessages = {
     username: {
@@ -101,6 +111,21 @@ function getValidationErrorMessage(error) {
     return message
 }
 
+/**
+ * Fastify错误处理器插件函数
+ *
+ * @async
+ * @param {FastifyInstance} fastify - Fastify实例
+ * @param {Object} options - 插件配置选项
+ * @returns {Promise<void>} 无返回值
+ * @throws {Error} 可能在设置错误处理器时抛出错误
+ *
+ * @description
+ * 该函数设置了一个全局错误处理器，用于：
+ * 1. 处理请求参数验证错误
+ * 2. 生成用户友好的错误消息
+ * 3. 返回标准的错误响应格式
+ */
 async function errorHandler(fastify, options) {
     fastify.setErrorHandler(function (error, request, reply) {
         // 处理验证错误
