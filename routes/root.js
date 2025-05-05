@@ -1,7 +1,7 @@
 /*
  * @Date: 2025-05-04 22:32:34
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-05 00:01:04
+ * @LastEditTime: 2025-05-05 16:57:50
  * @FilePath: /my-test-fastify/routes/root.js
  * @Description: 文件描述
  */
@@ -13,6 +13,7 @@
  * @param {Object} fastify - Fastify实例对象
  * @param {Object} opts - 路由配置选项
  */
+
 module.exports = async function (fastify, opts) {
   // 注册GET方法处理根路径('/')的请求
   // 当访问根路径时，返回一个简单的JSON对象，通常用于API健康检查

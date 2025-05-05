@@ -24,6 +24,16 @@ module.exports = async function (fastify, opts) {
      * @param {string} email - 有效的电子邮件地址
      * @returns {object} 包含注册结果的消息
      * @throws {400} 当用户名或邮箱已存在时
+     *
+     * properties : 定义对象属性的规则
+     * type : 属性的类型
+     * minLength : 字符串最小长度
+     * maxLength : 字符串最大长度
+     * pattern : 正则表达式匹配
+     * format : 预定义的格式验证（如email、date、time等）
+     * enum : 枚举可选值
+     * default : 默认值
+     * description : 字段描述
      */
     fastify.post('/register', {
         schema: {
@@ -34,9 +44,9 @@ module.exports = async function (fastify, opts) {
                     username: { type: 'string', minLength: 3 },
                     password: { type: 'string', minLength: 6 },
                     email: { type: 'string', format: 'email' }
-                }
+                },
             }
-        }
+        },
     }, async (request, reply) => {
         const { username, password, email } = request.body
         const hashedPassword = await bcrypt.hash(password, 10)
