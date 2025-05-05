@@ -1,7 +1,7 @@
 /*
  * @Date: 2025-05-04 23:02:29
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-04 23:02:30
+ * @LastEditTime: 2025-05-06 00:42:11
  * @FilePath: /my-test-fastify/plugins/auth.js
  * @Description: 认证和授权插件，提供JWT身份验证和CORS跨域支持
  */
@@ -38,7 +38,7 @@ module.exports = fp(async function (fastify, opts) {
      * 在生产环境中，secret应通过环境变量注入，避免硬编码
      */
     await fastify.register(require('@fastify/jwt'), {
-        secret: 'your-secret-key-here', // 在生产环境中应该使用环境变量
+        secret: 'huyirui', // 在生产环境中应该使用环境变量
         sign: {
             expiresIn: '1d' // Token有效期为1天
         }

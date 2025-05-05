@@ -131,7 +131,20 @@ module.exports = async function (fastify, opts) {
      * @throws {404} 当用户不存在时
      */
     fastify.get('/me', {
-        onRequest: [fastify.authenticate]
+        onRequest: [fastify.authenticate],
+        schema: {
+            response: {
+                200: {
+                    type: 'object',
+                    properties: {
+                        id: { type:'integer' },
+                        username: { type:'string' },
+                        email: { type:'string' },
+                        created_at: { type:'string', format:'date-time' }
+                    }
+                }
+            }
+        }
     }, async (request, reply) => {
         const connection = await fastify.mysql.getConnection()
         try {
