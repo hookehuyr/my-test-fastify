@@ -54,6 +54,22 @@ const validationMessages = {
 }
 
 /**
+ * 从验证错误对象中提取字段名
+ * @param {Object} validation - 验证错误对象
+ * @returns {string} 字段名
+ */
+function getFieldFromValidation(validation) {
+    if (validation.instancePath && typeof validation.instancePath === 'string') {
+        // 从instancePath中提取字段名，去除开头的斜杠
+        return validation.instancePath.slice(1)
+    } else if (validation.params) {
+        // 尝试从params中获取字段名
+        return validation.params.property || validation.params.missingProperty || '未知字段'
+    }
+    return '未知字段'
+}
+
+/**
  * 获取验证错误的中文提示信息
  * @param {Object} error - 验证错误对象
  * @returns {string} 格式化后的错误消息
@@ -64,19 +80,7 @@ function getValidationErrorMessage(error) {
     }
 
     const validation = error.validation[0]
-    let field = ''
-
-    // 处理不同类型的验证错误
-    if (validation.instancePath && typeof validation.instancePath === 'string') {
-        // 从instancePath中提取字段名，去除开头的斜杠
-        field = validation.instancePath.slice(1)
-    } else if (validation.params) {
-        // 尝试从params中获取字段名
-        field = validation.params.property || validation.params.missingProperty || '未知字段'
-    } else {
-        field = '未知字段'
-    }
-
+    const field = getFieldFromValidation(validation)
     const keyword = validation.keyword
     const params = validation.params || {}
 
@@ -102,16 +106,7 @@ async function errorHandler(fastify, options) {
         // 处理验证错误
         if (error.validation) {
             const validation = error.validation[0]
-            let field = ''
-
-            // 获取字段名
-            if (validation.instancePath && typeof validation.instancePath === 'string') {
-                field = validation.instancePath.slice(1)
-            } else if (validation.params) {
-                field = validation.params.property || validation.params.missingProperty || '未知字段'
-            } else {
-                field = '未知字段'
-            }
+            const field = getFieldFromValidation(validation)
 
             reply.status(400).send({
                 error: `字段 ${field} ${getValidationErrorMessage(error)}`
