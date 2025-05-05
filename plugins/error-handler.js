@@ -1,7 +1,7 @@
 /*
  * @Date: 2025-05-05 21:02:12
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-05 22:31:50
+ * @LastEditTime: 2025-05-05 23:13:16
  * @FilePath: /my-test-fastify/plugins/error-handler.js
  * @Description: 全局错误处理插件，提供统一的错误处理和友好的错误提示
  */
@@ -95,12 +95,18 @@ function getValidationErrorMessage(error) {
     const params = validation.params || {}
 
     // 获取对应字段的错误消息配置
-    let fieldMessages = validationMessages[field] || validationMessages._default
+    let fieldMessages = validationMessages[field]
     let message = fieldMessages && fieldMessages[keyword]
 
-    // 如果没有找到对应的错误消息，使用默认消息
+    // 如果字段特定消息中没有找到，尝试使用默认消息
     if (!message) {
-        message = validationMessages._default[keyword] || `${field}验证失败`
+        fieldMessages = validationMessages._default
+        message = fieldMessages && fieldMessages[keyword]
+    }
+
+    // 如果在字段特定消息和默认消息中都没有找到，返回原始错误信息
+    if (!message) {
+        return validation.message || `${field}验证失败`
     }
 
     // 替换消息中的参数
@@ -108,7 +114,7 @@ function getValidationErrorMessage(error) {
         message = message.replace('{limit}', params.limit)
     }
 
-    return message
+    return `${field}: ${message}`
 }
 
 /**
@@ -130,11 +136,9 @@ async function errorHandler(fastify, options) {
     fastify.setErrorHandler(function (error, request, reply) {
         // 处理验证错误
         if (error.validation) {
-            const validation = error.validation[0]
-            const field = getFieldFromValidation(validation)
-
             reply.status(400).send({
-                error: `字段 ${field} ${getValidationErrorMessage(error)}`
+                code: 400,
+                msg: `${getValidationErrorMessage(error)}`
             })
             return
         }
