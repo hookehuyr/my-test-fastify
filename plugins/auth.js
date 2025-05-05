@@ -1,7 +1,7 @@
 /*
  * @Date: 2025-05-04 23:02:29
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-06 00:42:11
+ * @LastEditTime: 2025-05-06 01:26:24
  * @FilePath: /my-test-fastify/plugins/auth.js
  * @Description: 认证和授权插件，提供JWT身份验证和CORS跨域支持
  */
@@ -33,10 +33,10 @@ const fp = require('fastify-plugin')
  * })
  */
 module.exports = fp(async function (fastify, opts) {
-    // 注册cookie插件
+    // 注册cookie插件, 用于处理jwt的token
     await fastify.register(require('@fastify/cookie'), {
         secret: 'huyirui', // 在生产环境中应该使用环境变量
-        hook: 'onRequest'
+        hook: 'onRequest', // 在每个请求上执行cookie解析
     })
 
     /**
@@ -69,31 +69,55 @@ module.exports = fp(async function (fastify, opts) {
     })
 
     /**
-     * 身份验证装饰器
+     * 身份验证装饰器 - 用于验证用户的身份认证状态
+     *
      * @description
-     * 用于保护需要认证的路由
-     * 验证请求中的JWT令牌，确保用户已经登录
+     * 该装饰器实现了双重身份验证机制：
+     * 1. 首先尝试从请求头中验证JWT令牌
+     * 2. 如果请求头验证失败，则尝试从cookie中获取并验证token
+     *
+     * 验证成功后，用户信息将被添加到request.user中，以便后续路由处理程序使用
      *
      * @function authenticate
      * @async
      * @param {Object} request - Fastify请求对象
+     * @param {Object} request.headers - 请求头对象，可能包含Authorization头
+     * @param {Object} request.cookies - 请求cookie对象
+     * @param {string} request.cookies.token - JWT令牌cookie
      * @param {Object} reply - Fastify响应对象
-     * @throws {Error} 401 - 当令牌无效或过期时
+     * @returns {Promise<void>} 验证成功时无返回值
+     * @throws {Error} 401 - 在以下情况会抛出未授权错误：
+     *   - 请求头中的JWT令牌无效或过期
+     *   - Cookie中的token无效或过期
+     *   - 未提供任何有效的认证信息
+     *
+     * @example
+     * // 在路由中使用装饰器
+     * fastify.get('/protected-route', {
+     *   onRequest: [fastify.authenticate]
+     * }, async (request, reply) => {
+     *   // 此时request.user已包含解码后的用户信息
+     *   return { user: request.user }
+     * })
      */
     fastify.decorate('authenticate', async function(request, reply) {
         try {
+            // 首先尝试验证请求头中的JWT令牌
             await request.jwtVerify()
         } catch (err) {
-            // 尝试从cookie中获取token
+            // 如果请求头验证失败，尝试从cookie中获取token
             const token = request.cookies.token
             if (token) {
                 try {
+                    // 验证cookie中的token并解码用户信息
                     const decoded = await fastify.jwt.verify(token)
                     request.user = decoded
                 } catch (cookieErr) {
+                    // cookie中的token无效或过期
                     reply.code(401).send({ error: '未授权访问' })
                 }
             } else {
+                // 未提供任何认证信息
                 reply.code(401).send({ error: '未授权访问' })
             }
         }

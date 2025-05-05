@@ -114,7 +114,7 @@ module.exports = async function (fastify, opts) {
                 return
             }
 
-            // 生成JWT令牌
+            // 生成JWT令牌, 包含用户ID和用户名
             const token = fastify.jwt.sign({ id: user.id, username: user.username })
 
             // 设置cookie
