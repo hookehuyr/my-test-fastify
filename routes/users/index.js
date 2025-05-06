@@ -8,32 +8,47 @@
  * - 用户登录：验证用户身份并生成JWT令牌
  * - 获取用户信息：获取当前登录用户的详细信息
  *
+ * 安全性考虑：
+ * - 密码加密：使用bcrypt进行密码哈希
+ * - JWT认证：使用安全的token机制
+ * - Cookie安全：启用httpOnly和secure选项
+ * - CSRF防护：使用strict SameSite策略
+ *
+ * 性能优化：
+ * - 数据库连接：使用连接池管理
+ * - 错误处理：统一的错误响应格式
+ * - 输入验证：使用JSON Schema进行请求验证
+ *
  * @module routes/users
- * @requires bcryptjs - 用于密码加密和验证
+ * @requires ../models/User - 用户模型类
  */
 
-const bcrypt = require('bcryptjs')
+const path = require('path')
+const User = require(path.join(__dirname, '../../models/User'))
 
 module.exports = async function (fastify, opts) {
     /**
      * 用户注册接口
      *
+     * 该接口处理新用户注册请求，执行以下操作：
+     * 1. 验证用户输入数据的合法性
+     * 2. 检查用户名和邮箱是否已存在
+     * 3. 对密码进行加密处理
+     * 4. 创建新用户记录
+     *
      * @route POST /register
      * @param {string} username - 用户名，至少3个字符
      * @param {string} password - 密码，至少6个字符
      * @param {string} email - 有效的电子邮件地址
-     * @returns {object} 包含注册结果的消息
-     * @throws {400} 当用户名或邮箱已存在时
+     * @returns {object} 201 - 包含注册结果的消息 {message: '注册成功'}
+     * @throws {400} 当用户名或邮箱已存在时 {error: '用户名或邮箱已存在'}
+     * @throws {500} 服务器内部错误
      *
-     * properties : 定义对象属性的规则
-     * type : 属性的类型
-     * minLength : 字符串最小长度
-     * maxLength : 字符串最大长度
-     * pattern : 正则表达式匹配
-     * format : 预定义的格式验证（如email、date、time等）
-     * enum : 枚举可选值
-     * default : 默认值
-     * description : 字段描述
+     * Schema属性说明：
+     * - type: 属性的数据类型
+     * - minLength: 字符串最小长度限制
+     * - format: 预定义的格式验证规则
+     * - required: 必填字段列表
      */
     fastify.post('/register', {
         schema: {
@@ -51,20 +66,10 @@ module.exports = async function (fastify, opts) {
             }
         },
     }, async (request, reply) => {
-        const { username, password, email } = request.body
-        const hashedPassword = await bcrypt.hash(password, 10)
-
         try {
-            const connection = await fastify.mysql.getConnection()
-            try {
-                await connection.query(
-                    'INSERT INTO users (username, password, email) VALUES (?, ?, ?)',
-                    [username, hashedPassword, email]
-                )
-                reply.code(201).send({ message: '注册成功' })
-            } finally {
-                connection.release()
-            }
+            const userModel = new User(fastify)
+            await userModel.create(request.body)
+            reply.code(201).send({ message: '注册成功' })
         } catch (err) {
             if (err.code === 'ER_DUP_ENTRY') {
                 reply.code(400).send({ error: '用户名或邮箱已存在' })
@@ -77,11 +82,22 @@ module.exports = async function (fastify, opts) {
     /**
      * 用户登录接口
      *
+     * 该接口处理用户登录请求，执行以下操作：
+     * 1. 验证用户凭证
+     * 2. 生成JWT访问令牌
+     * 3. 设置安全的HTTP-only cookie
+     *
      * @route POST /login
      * @param {string} username - 用户名
      * @param {string} password - 密码
-     * @returns {object} 包含JWT令牌的对象
-     * @throws {401} 当用户名或密码错误时
+     * @returns {object} 200 - 登录成功响应 {message: '登录成功'}
+     * @throws {401} 当用户名或密码错误时 {error: '用户名或密码错误'}
+     * @throws {500} 服务器内部错误
+     *
+     * 安全特性：
+     * - 使用bcrypt验证密码
+     * - JWT令牌用于后续请求认证
+     * - 安全的cookie配置防止XSS和CSRF攻击
      */
     fastify.post('/login', {
         schema: {
@@ -98,51 +114,47 @@ module.exports = async function (fastify, opts) {
         }
     }, async (request, reply) => {
         const { username, password } = request.body
+        const userModel = new User(fastify)
+        const user = await userModel.verify(username, password)
 
-        const connection = await fastify.mysql.getConnection()
-        try {
-            const [rows] = await connection.query(
-                'SELECT * FROM users WHERE username = ?',
-                [username]
-            )
-
-            if (rows.length === 0) {
-                reply.code(401).send({ error: '用户名或密码错误' })
-                return
-            }
-
-            const user = rows[0]
-            const valid = await bcrypt.compare(password, user.password)
-
-            if (!valid) {
-                reply.code(401).send({ error: '用户名或密码错误' })
-                return
-            }
-
-            // 生成JWT令牌, 包含用户ID和用户名
-            const token = fastify.jwt.sign({ id: user.id, username: user.username })
-
-            // 设置cookie
-            reply.setCookie('token', token, {
-                path: '/',
-                httpOnly: true, // 防止客户端JavaScript访问
-                secure: process.env.NODE_ENV === 'production', // 在生产环境中只通过HTTPS发送
-                sameSite: 'strict' // 防止CSRF攻击
-            })
-
-            reply.send({ message: '登录成功' })
-        } finally {
-            connection.release()
+        if (!user) {
+            reply.code(401).send({ error: '用户名或密码错误' })
+            return
         }
+
+        // 生成JWT令牌, 包含用户ID和用户名
+        const token = fastify.jwt.sign({ id: user.id, username: user.username })
+
+        // 设置cookie
+        reply.setCookie('token', token, {
+            path: '/',
+            httpOnly: true, // 防止客户端JavaScript访问
+            secure: process.env.NODE_ENV === 'production', // 在生产环境中只通过HTTPS发送
+            sameSite: 'strict' // 防止CSRF攻击
+        })
+
+        reply.send({ message: '登录成功' })
     })
 
     /**
      * 获取当前登录用户信息接口
      *
+     * 该接口返回当前认证用户的详细信息，执行以下操作：
+     * 1. 验证JWT令牌
+     * 2. 获取用户详细信息
+     * 3. 过滤敏感数据（如密码）
+     *
      * @route GET /me
      * @authentication 需要JWT令牌验证
-     * @returns {object} 用户详细信息（不包含密码）
-     * @throws {404} 当用户不存在时
+     * @returns {object} 200 - 用户详细信息 {id, username, email, created_at}
+     * @throws {401} 未提供有效的认证令牌
+     * @throws {404} 当用户不存在时 {error: '用户不存在'}
+     * @throws {500} 服务器内部错误
+     *
+     * 安全考虑：
+     * - 使用认证中间件保护路由
+     * - 仅返回非敏感用户信息
+     * - 验证用户ID的有效性
      */
     fastify.get('/me', {
         onRequest: [fastify.authenticate],
@@ -151,19 +163,13 @@ module.exports = async function (fastify, opts) {
             description: '获取当前登录用户信息接口',
         }
     }, async (request, reply) => {
-        const connection = await fastify.mysql.getConnection()
-        try {
-            const [rows] = await connection.query(
-                'SELECT id, username, email, created_at FROM users WHERE id = ?',
-                [request.user.id]
-            )
-            if (rows.length === 0) {
-                reply.code(404).send({ error: '用户不存在' })
-                return
-            }
-            reply.send(rows[0])
-        } finally {
-            connection.release()
+        const userModel = new User(fastify)
+        const user = await userModel.findById(request.user.id)
+
+        if (!user) {
+            reply.code(404).send({ error: '用户不存在' })
+            return
         }
+        reply.send(user)
     })
 }
