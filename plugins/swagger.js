@@ -16,9 +16,9 @@ const fp = require('fastify-plugin')
  * - 集成了Swagger UI，可以通过 /documentation 路径访问API文档 3
  * 你现在可以通过以下步骤使用Swagger文档：
 
- * 1. 访问 http://localhost:3000/documentation 查看API文档界面
- * 2. 通过 http://localhost:3000/documentation/json 获取OpenAPI规范的JSON格式
- * 3. 通过 http://localhost:3000/documentation/yaml 获取OpenAPI规范的YAML格式
+ * 1. 访问 http://localhost:3000/doc 查看API文档界面
+ * 2. 通过 http://localhost:3000/doc/json 获取OpenAPI规范的JSON格式
+ * 3. 通过 http://localhost:3000/doc/yaml 获取OpenAPI规范的YAML格式
  * 在编写路由时，只需要按照OpenAPI规范在路由配置中添加schema即可自动生成API文档。
 */
 
