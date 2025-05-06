@@ -12,6 +12,9 @@
  * @module routes/orders
  */
 
+const path = require('path')
+const Order = require(path.join(__dirname, '../../models/Order'))
+
 module.exports = async function (fastify, opts) {
     /**
      * 创建订单
