@@ -11,7 +11,11 @@
  * - 删除商品（需要认证）
  *
  * @module routes/products
+ * @requires ../models/Product - 商品模型类
  */
+
+const path = require('path')
+const Product = require(path.join(__dirname, '../../models/Product'))
 
 module.exports = async function (fastify, opts) {
     /**
@@ -44,18 +48,9 @@ module.exports = async function (fastify, opts) {
             }
         }
     }, async (request, reply) => {
-        const { name, description, price, stock } = request.body
-
-        const connection = await fastify.mysql.getConnection()
-        try {
-            const [result] = await connection.query(
-                'INSERT INTO products (name, description, price, stock) VALUES (?, ?, ?, ?)',
-                [name, description, price, stock]
-            )
-            reply.code(201).send({ id: result.insertId, message: '商品创建成功' })
-        } finally {
-            connection.release()
-        }
+        const productModel = new Product(fastify)
+        const product = await productModel.create(request.body)
+        reply.code(201).send({ id: product.id, message: '商品创建成功' })
     })
 
     /**
@@ -84,14 +79,10 @@ module.exports = async function (fastify, opts) {
                 }
             }
         }
-    },async (request, reply) => {
-        const connection = await fastify.mysql.getConnection()
-        try {
-            const [rows] = await connection.query('SELECT * FROM products')
-            reply.send(rows)
-        } finally {
-            connection.release()
-        }
+    }, async (request, reply) => {
+        const productModel = new Product(fastify)
+        const products = await productModel.findAll()
+        reply.send(products)
     })
 
     /**
@@ -118,31 +109,23 @@ module.exports = async function (fastify, opts) {
                     type: 'object',
                     properties: {
                         id: { type: 'integer' },
-                        name: { type:'string' },
-                        description: { type:'string' },
+                        name: { type: 'string' },
+                        description: { type: 'string' },
                         price: { type: 'number' },
                         stock: { type: 'integer' }
                     }
                 }
             }
         }
-    },async (request, reply) => {
-        const { id } = request.params
+    }, async (request, reply) => {
+        const productModel = new Product(fastify)
+        const product = await productModel.findById(request.params.id)
 
-        const connection = await fastify.mysql.getConnection()
-        try {
-            const [rows] = await connection.query(
-                'SELECT * FROM products WHERE id = ?',
-                [id]
-            )
-            if (rows.length === 0) {
-                reply.code(404).send({ error: '商品不存在' })
-                return
-            }
-            reply.send(rows[0])
-        } finally {
-            connection.release()
+        if (!product) {
+            reply.code(404).send({ error: '商品不存在' })
+            return
         }
+        reply.send(product)
     })
 
     /**
@@ -183,23 +166,14 @@ module.exports = async function (fastify, opts) {
             }
         }
     }, async (request, reply) => {
-        const { id } = request.params
-        const updates = request.body
+        const productModel = new Product(fastify)
+        const success = await productModel.update(request.params.id, request.body)
 
-        const connection = await fastify.mysql.getConnection()
-        try {
-            const [result] = await connection.query(
-                'UPDATE products SET ? WHERE id = ?',
-                [updates, id]
-            )
-            if (result.affectedRows === 0) {
-                reply.code(404).send({ error: '商品不存在' })
-                return
-            }
-            reply.send({ message: '商品更新成功' })
-        } finally {
-            connection.release()
+        if (!success) {
+            reply.code(404).send({ error: '商品不存在' })
+            return
         }
+        reply.send({ message: '商品更新成功' })
     })
 
     /**
@@ -225,21 +199,13 @@ module.exports = async function (fastify, opts) {
             }
         }
     }, async (request, reply) => {
-        const { id } = request.params
+        const productModel = new Product(fastify)
+        const success = await productModel.delete(request.params.id)
 
-        const connection = await fastify.mysql.getConnection()
-        try {
-            const [result] = await connection.query(
-                'DELETE FROM products WHERE id = ?',
-                [id]
-            )
-            if (result.affectedRows === 0) {
-                reply.code(404).send({ error: '商品不存在' })
-                return
-            }
-            reply.send({ message: '商品删除成功' })
-        } finally {
-            connection.release()
+        if (!success) {
+            reply.code(404).send({ error: '商品不存在' })
+            return
         }
+        reply.send({ message: '商品删除成功' })
     })
 }
