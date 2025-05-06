@@ -49,6 +49,7 @@ module.exports = fp(async function (fastify, opts) {
         { name: 'users', description: '用户相关接口' },
         { name: 'products', description: '产品相关接口' },
         { name: 'orders', description: '订单相关接口' },
+        { name: 'cart', description: '购物车相关接口'}
       ],
       // 通用的错误响应模型
       components: {

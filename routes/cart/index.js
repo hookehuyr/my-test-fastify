@@ -28,7 +28,7 @@ module.exports = async function (fastify, opts) {
     fastify.post('/', {
         onRequest: [fastify.authenticate],
         schema: {
-            tag: ['cart'],
+            tags: ['cart'],
             description: '将商品添加到购物车中',
             body: {
                 type: 'object',
@@ -101,7 +101,7 @@ module.exports = async function (fastify, opts) {
     fastify.get('/', {
         onRequest: [fastify.authenticate],
         schema: {
-            tag: ['cart'],
+            tags: ['cart'],
             description: '获取购物车列表',
             response: {
                 200: {
@@ -155,7 +155,7 @@ module.exports = async function (fastify, opts) {
     fastify.put('/:id', {
         onRequest: [fastify.authenticate],
         schema: {
-            tag: ['cart'],
+            tags: ['cart'],
             description: '更新购物车商品数量',
             params: {
                 type: 'object',
@@ -221,7 +221,7 @@ module.exports = async function (fastify, opts) {
     fastify.delete('/:id', {
         onRequest: [fastify.authenticate],
         schema: {
-            tag: ['cart'],
+            tags: ['cart'],
             description: '从购物车删除商品',
             params: {
                 type: 'object',
