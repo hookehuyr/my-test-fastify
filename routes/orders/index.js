@@ -27,6 +27,8 @@ module.exports = async function (fastify, opts) {
     fastify.post('/', {
         onRequest: [fastify.authenticate],
         schema: {
+            tags: ['orders'],
+            description: '创建订单',
             body: {
                 type: 'object',
                 required: ['cart_items'],
@@ -119,7 +121,41 @@ module.exports = async function (fastify, opts) {
      * @throws {401} - 未认证
      */
     fastify.get('/', {
-        onRequest: [fastify.authenticate]
+        onRequest: [fastify.authenticate],
+        schema: {
+            tags: ['orders'],
+            description: '获取当前用户的订单列表',
+            response: {
+                200: {
+                    type: 'array',
+                    items: {
+                        type: 'object',
+                        properties: {
+                            id: { type: 'integer' },
+                            user_id: { type: 'integer' },
+                            total_amount: { type: 'number' },
+                            status: { type: 'string' },
+                            created_at: { type: 'string' },
+                            updated_at: { type: 'string' },
+                            items: {
+                                type: 'array',
+                                items: {
+                                    type: 'object',
+                                    properties: {
+                                        id: { type: 'integer' },
+                                        order_id: { type: 'integer' },
+                                        product_id: { type: 'integer' },
+                                        quantity: { type: 'integer' },
+                                        price: { type: 'number' },
+                                        name: { type: 'string' }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }, async (request, reply) => {
         const user_id = request.user.id
 
@@ -159,7 +195,46 @@ module.exports = async function (fastify, opts) {
      * @throws {404} - 订单不存在
      */
     fastify.get('/:id', {
-        onRequest: [fastify.authenticate]
+        onRequest: [fastify.authenticate],
+        schema: {
+            tags: ['orders'],
+            description: '获取订单详情',
+            params: {
+                type: 'object',
+                properties: {
+                    id: {
+                        type: 'integer'
+                    }
+                }
+            },
+            response: {
+                200: {
+                    type: 'object',
+                    properties: {
+                        id: { type: 'integer' },
+                        user_id: { type: 'integer' },
+                        total_amount: { type: 'number' },
+                        status: { type:'string' },
+                        created_at: { type:'string' },
+                        updated_at: { type:'string' },
+                        items: {
+                            type: 'array',
+                            items: {
+                                type: 'object',
+                                properties: {
+                                    id: { type: 'integer' },
+                                    order_id: { type: 'integer' },
+                                    product_id: { type: 'integer' },
+                                    quantity: { type: 'integer' },
+                                    price: { type: 'number' },
+                                    name: { type:'string' }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }, async (request, reply) => {
         const { id } = request.params
         const user_id = request.user.id
@@ -207,6 +282,16 @@ module.exports = async function (fastify, opts) {
     fastify.put('/:id/status', {
         onRequest: [fastify.authenticate],
         schema: {
+            tags: ['orders'],
+            description: '更新订单状态',
+            params: {
+                type: 'object',
+                properties: {
+                    id: {
+                        type: 'integer'
+                    }
+                }
+            },
             body: {
                 type: 'object',
                 required: ['status'],
