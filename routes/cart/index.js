@@ -28,12 +28,22 @@ module.exports = async function (fastify, opts) {
     fastify.post('/', {
         onRequest: [fastify.authenticate],
         schema: {
+            tag: ['cart'],
+            description: '将商品添加到购物车中',
             body: {
                 type: 'object',
                 required: ['product_id', 'quantity'],
                 properties: {
                     product_id: { type: 'integer' },
                     quantity: { type: 'integer', minimum: 1 }
+                }
+            },
+            response: {
+                201: {
+                    type: 'object',
+                    properties: {
+                        message: { type: 'string' }
+                    }
                 }
             }
         }
@@ -89,7 +99,28 @@ module.exports = async function (fastify, opts) {
      * @throws {401} - 未认证
      */
     fastify.get('/', {
-        onRequest: [fastify.authenticate]
+        onRequest: [fastify.authenticate],
+        schema: {
+            tag: ['cart'],
+            description: '获取购物车列表',
+            response: {
+                200: {
+                    type: 'array',
+                    items: {
+                        type: 'object',
+                        properties: {
+                            id: { type: 'integer' },
+                            user_id: { type: 'integer' },
+                            product_id: { type: 'integer' },
+                            quantity: { type: 'integer' },
+                            name: { type: 'string' },
+                            price: { type: 'number' },
+                            stock: { type: 'integer' }
+                        }
+                    }
+                }
+            }
+        }
     }, async (request, reply) => {
         const user_id = request.user.id
 
@@ -124,13 +155,21 @@ module.exports = async function (fastify, opts) {
     fastify.put('/:id', {
         onRequest: [fastify.authenticate],
         schema: {
+            tag: ['cart'],
+            description: '更新购物车商品数量',
+            params: {
+                type: 'object',
+                properties: {
+                    id: { type: 'integer' }
+                }
+            },
             body: {
                 type: 'object',
                 required: ['quantity'],
                 properties: {
                     quantity: { type: 'integer', minimum: 1 }
                 }
-            }
+            },
         }
     }, async (request, reply) => {
         const { id } = request.params
@@ -180,7 +219,17 @@ module.exports = async function (fastify, opts) {
      * @throws {404} - 购物车商品不存在
      */
     fastify.delete('/:id', {
-        onRequest: [fastify.authenticate]
+        onRequest: [fastify.authenticate],
+        schema: {
+            tag: ['cart'],
+            description: '从购物车删除商品',
+            params: {
+                type: 'object',
+                properties: {
+                    id: { type: 'integer' }
+                }
+            }
+        }
     }, async (request, reply) => {
         const { id } = request.params
         const user_id = request.user.id
