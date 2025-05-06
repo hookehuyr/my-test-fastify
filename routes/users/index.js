@@ -37,6 +37,9 @@ module.exports = async function (fastify, opts) {
      */
     fastify.post('/register', {
         schema: {
+            tags: ['users'],
+            description: '用户注册接口',
+            // 定义请求体的结构
             body: {
                 type: 'object',
                 required: ['username', 'password', 'email'],
@@ -82,6 +85,8 @@ module.exports = async function (fastify, opts) {
      */
     fastify.post('/login', {
         schema: {
+            tags: ['users'],
+            description: '用户登录接口',
             body: {
                 type: 'object',
                 required: ['username', 'password'],
@@ -141,6 +146,10 @@ module.exports = async function (fastify, opts) {
      */
     fastify.get('/me', {
         onRequest: [fastify.authenticate],
+        schema: {
+            tags: ['users'],
+            description: '获取当前登录用户信息接口',
+        }
     }, async (request, reply) => {
         const connection = await fastify.mysql.getConnection()
         try {
