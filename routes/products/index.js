@@ -30,6 +30,8 @@ module.exports = async function (fastify, opts) {
     fastify.post('/', {
         onRequest: [fastify.authenticate],
         schema: {
+            tags: ['products'],
+            description: '创建新商品',
             body: {
                 type: 'object',
                 required: ['name', 'price', 'stock'],
@@ -62,7 +64,27 @@ module.exports = async function (fastify, opts) {
      * @route GET /products
      * @returns {Array<object>} 200 - 商品列表数组
      */
-    fastify.get('/', async (request, reply) => {
+    fastify.get('/', {
+        schema: {
+            tags: ['products'],
+            description: '获取所有商品列表',
+            response: {
+                200: {
+                    type: 'array',
+                    items: {
+                        type: 'object',
+                        properties: {
+                            id: { type: 'integer' },
+                            name: { type: 'string' },
+                            description: { type: 'string' },
+                            price: { type: 'number' },
+                            stock: { type: 'integer' }
+                        }
+                    }
+                }
+            }
+        }
+    },async (request, reply) => {
         const connection = await fastify.mysql.getConnection()
         try {
             const [rows] = await connection.query('SELECT * FROM products')
@@ -80,7 +102,31 @@ module.exports = async function (fastify, opts) {
      * @returns {object} 200 - 商品详细信息
      * @throws {404} - 商品不存在
      */
-    fastify.get('/:id', async (request, reply) => {
+    fastify.get('/:id', {
+        schema: {
+            tags: ['products'],
+            description: '获取单个商品详情',
+            params: {
+                type: 'object',
+                required: ['id'],
+                properties: {
+                    id: { type: 'integer' }
+                }
+            },
+            response: {
+                200: {
+                    type: 'object',
+                    properties: {
+                        id: { type: 'integer' },
+                        name: { type:'string' },
+                        description: { type:'string' },
+                        price: { type: 'number' },
+                        stock: { type: 'integer' }
+                    }
+                }
+            }
+        }
+    },async (request, reply) => {
         const { id } = request.params
 
         const connection = await fastify.mysql.getConnection()
@@ -117,6 +163,15 @@ module.exports = async function (fastify, opts) {
     fastify.put('/:id', {
         onRequest: [fastify.authenticate],
         schema: {
+            tags: ['products'],
+            description: '更新商品信息',
+            params: {
+                type: 'object',
+                required: ['id'],
+                properties: {
+                    id: { type: 'integer', minimum: 1 }
+                }
+            },
             body: {
                 type: 'object',
                 properties: {
@@ -157,7 +212,18 @@ module.exports = async function (fastify, opts) {
      * @throws {404} - 商品不存在
      */
     fastify.delete('/:id', {
-        onRequest: [fastify.authenticate]
+        onRequest: [fastify.authenticate],
+        schema: {
+            tags: ['products'],
+            description: '删除商品',
+            params: {
+                type: 'object',
+                required: ['id'],
+                properties: {
+                    id: { type: 'integer', minimum: 1 }
+                }
+            }
+        }
     }, async (request, reply) => {
         const { id } = request.params
 
