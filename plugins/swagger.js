@@ -13,9 +13,11 @@ const fp = require('fastify-plugin')
  * - 设置了开发服务器地址，匹配你的API前缀 /api/v1
  * - 添加了API标签分类，方便接口管理
  * - 定义了通用的错误响应模型
- * - 集成了Swagger UI，可以通过 /documentation 路径访问API文档 3
+ * - 集成了Swagger UI，可以通过 /doc 路径访问API文档界面
+ * - 提供了OpenAPI规范的JSON和YAML格式，方便集成到其他工具中
+ *
+ *
  * 你现在可以通过以下步骤使用Swagger文档：
-
  * 1. 访问 http://localhost:3000/doc 查看API文档界面
  * 2. 通过 http://localhost:3000/doc/json 获取OpenAPI规范的JSON格式
  * 3. 通过 http://localhost:3000/doc/yaml 获取OpenAPI规范的YAML格式
@@ -40,7 +42,7 @@ module.exports = fp(async function (fastify, opts) {
       servers: [
         {
           url: 'http://localhost:3000/api/v1',
-          description: 'Development server'
+          description: '开发服务器'
         }
       ],
       // 标签分类
