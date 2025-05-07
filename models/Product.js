@@ -26,6 +26,7 @@ class Product {
      */
     constructor(fastify) {
         this.fastify = fastify
+        this.productRepository = fastify.orm.getRepository('Product')
     }
 
     /**
@@ -39,17 +40,8 @@ class Product {
      * @returns {Promise<Object>} 创建成功的商品信息
      */
     async create(productData) {
-        const { name, description, price, stock } = productData
-        const connection = await this.fastify.mysql.getConnection()
-        try {
-            const [result] = await connection.query(
-                'INSERT INTO products (name, description, price, stock) VALUES (?, ?, ?, ?)',
-                [name, description, price, stock]
-            )
-            return { id: result.insertId, ...productData }
-        } finally {
-            connection.release()
-        }
+        const product = this.productRepository.create(productData)
+        return await this.productRepository.save(product)
     }
 
     /**
@@ -58,13 +50,7 @@ class Product {
      * @returns {Promise<Array>} 商品列表
      */
     async findAll() {
-        const connection = await this.fastify.mysql.getConnection()
-        try {
-            const [rows] = await connection.query('SELECT * FROM products')
-            return rows
-        } finally {
-            connection.release()
-        }
+        return await this.productRepository.find()
     }
 
     /**
@@ -74,16 +60,10 @@ class Product {
      * @returns {Promise<Object|null>} 商品信息
      */
     async findById(productId) {
-        const connection = await this.fastify.mysql.getConnection()
-        try {
-            const [rows] = await connection.query(
-                'SELECT * FROM products WHERE id = ?',
-                [productId]
-            )
-            return rows.length > 0 ? rows[0] : null
-        } finally {
-            connection.release()
-        }
+        const product = await this.productRepository.findOne({
+            where: { id: productId }
+        })
+        return product || null
     }
 
     /**
@@ -94,16 +74,8 @@ class Product {
      * @returns {Promise<boolean>} 更新是否成功
      */
     async update(productId, updates) {
-        const connection = await this.fastify.mysql.getConnection()
-        try {
-            const [result] = await connection.query(
-                'UPDATE products SET ? WHERE id = ?',
-                [updates, productId]
-            )
-            return result.affectedRows > 0
-        } finally {
-            connection.release()
-        }
+        const result = await this.productRepository.update(productId, updates)
+        return result.affected > 0
     }
 
     /**
@@ -113,16 +85,8 @@ class Product {
      * @returns {Promise<boolean>} 删除是否成功
      */
     async delete(productId) {
-        const connection = await this.fastify.mysql.getConnection()
-        try {
-            const [result] = await connection.query(
-                'DELETE FROM products WHERE id = ?',
-                [productId]
-            )
-            return result.affectedRows > 0
-        } finally {
-            connection.release()
-        }
+        const result = await this.productRepository.delete(productId)
+        return result.affected > 0
     }
 }
 

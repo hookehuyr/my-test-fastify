@@ -26,6 +26,7 @@ class User {
      */
     constructor(fastify) {
         this.fastify = fastify
+        this.userRepository = fastify.orm.getRepository('User')
     }
 
     /**
@@ -42,16 +43,15 @@ class User {
         const { username, password, email } = userData
         const hashedPassword = await bcrypt.hash(password, 10)
 
-        const connection = await this.fastify.mysql.getConnection()
-        try {
-            const [result] = await connection.query(
-                'INSERT INTO users (username, password, email) VALUES (?, ?, ?)',
-                [username, hashedPassword, email]
-            )
-            return { id: result.insertId, username, email }
-        } finally {
-            connection.release()
-        }
+        const user = this.userRepository.create({
+            username,
+            password: hashedPassword,
+            email
+        })
+
+        await this.userRepository.save(user)
+        const { password: _, ...userWithoutPassword } = user
+        return userWithoutPassword
     }
 
     /**
@@ -62,22 +62,17 @@ class User {
      * @returns {Promise<Object|null>} 验证成功返回用户信息，失败返回null
      */
     async verify(username, password) {
-        const connection = await this.fastify.mysql.getConnection()
-        try {
-            const [rows] = await connection.query(
-                'SELECT * FROM users WHERE username = ?',
-                [username]
-            )
+        const user = await this.userRepository.findOne({
+            where: { username }
+        })
 
-            if (rows.length === 0) return null
+        if (!user) return null
 
-            const user = rows[0]
-            const valid = await bcrypt.compare(password, user.password)
+        const valid = await bcrypt.compare(password, user.password)
+        if (!valid) return null
 
-            return valid ? user : null
-        } finally {
-            connection.release()
-        }
+        const { password: _, ...userWithoutPassword } = user
+        return userWithoutPassword
     }
 
     /**
@@ -87,16 +82,12 @@ class User {
      * @returns {Promise<Object|null>} 用户信息（不包含密码）
      */
     async findById(userId) {
-        const connection = await this.fastify.mysql.getConnection()
-        try {
-            const [rows] = await connection.query(
-                'SELECT id, username, email, created_at FROM users WHERE id = ?',
-                [userId]
-            )
-            return rows.length > 0 ? rows[0] : null
-        } finally {
-            connection.release()
-        }
+        const user = await this.userRepository.findOne({
+            where: { id: userId },
+            select: ['id', 'username', 'email', 'created_at']
+        })
+
+        return user || null
     }
 }
 
