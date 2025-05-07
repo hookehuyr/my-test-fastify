@@ -108,11 +108,18 @@ module.exports = async function (fastify, opts) {
                 200: {
                     type: 'object',
                     properties: {
-                        id: { type: 'integer' },
-                        name: { type: 'string' },
-                        description: { type: 'string' },
-                        price: { type: 'number' },
-                        stock: { type: 'integer' }
+                        ret: { type: 'string' },
+                        item: {
+                            type: 'object',
+                            properties: {
+                                id: { type: 'integer' },
+                                name: { type: 'string' },
+                                description: { type: 'string' },
+                                price: { type: 'number' },
+                                stock: { type: 'integer' }
+                            }
+                        },
+                        msg: { type: 'string' }
                     }
                 }
             }
@@ -125,7 +132,7 @@ module.exports = async function (fastify, opts) {
             reply.code(404).send({ error: '商品不存在' })
             return
         }
-        reply.send(product)
+        reply.code(200).send({ ret: 'OK', item: product, msg: '查询成功' })
     })
 
     /**
