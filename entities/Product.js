@@ -1,7 +1,7 @@
 /*
  * @Date: 2025-05-07 14:09:32
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-07 14:09:34
+ * @LastEditTime: 2025-05-07 15:35:58
  * @FilePath: /my-test-fastify/entities/Product.js
  * @Description: 文件描述
  */
@@ -31,9 +31,9 @@ module.exports = new EntitySchema({
             nullable: true
         },
         price: {
-            type: 'decimal',
-            precision: 10,
-            scale: 2
+            type: 'decimal', // 使用decimal类型存储价格
+            precision: 10, // 总位数
+            scale: 2 // 小数位数
         },
         stock: {
             type: 'int',

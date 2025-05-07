@@ -1,7 +1,7 @@
 /*
  * @Date: 2025-05-07 14:09:40
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-07 14:09:42
+ * @LastEditTime: 2025-05-07 15:55:34
  * @FilePath: /my-test-fastify/entities/CartItem.js
  * @Description: 文件描述
  */
@@ -38,7 +38,7 @@ module.exports = new EntitySchema({
             joinColumn: {
                 name: 'user_id'
             },
-            onDelete: 'CASCADE'
+            onDelete: 'CASCADE' // 当用户被删除时，删除购物车中的所有商品
         },
         product: {
             type: 'many-to-one',
@@ -46,7 +46,7 @@ module.exports = new EntitySchema({
             joinColumn: {
                 name: 'product_id'
             },
-            onDelete: 'CASCADE'
+            onDelete: 'CASCADE' // 当商品被删除时，删除购物车中的商品
         }
     }
 })

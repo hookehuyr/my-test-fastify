@@ -11,8 +11,10 @@
 
 'use strict'
 
+// 确保在使用TypeORM之前已经加载了reflect-metadata
 require('reflect-metadata')
 const fp = require('fastify-plugin')
+// 导入TypeORM库中的DataSource类
 const { DataSource } = require('typeorm')
 
 module.exports = fp(async function (fastify, opts) {
@@ -23,17 +25,19 @@ module.exports = fp(async function (fastify, opts) {
         username: 'root',
         password: 'huyirui520',
         database: 'ecommerce',
-        synchronize: true,
+        synchronize: true, // 自动同步数据库结构
         logging: false,
         entities: [
-            require('../entities/User'),
             require('../entities/Product'),
-            require('../entities/CartItem'),
             require('../entities/Order'),
-            require('../entities/OrderItem')
+            require('../entities/OrderItem'),
+            require('../entities/CartItem'),
+            require('../entities/User')
         ]
     })
 
+    // 初始化数据源
     await AppDataSource.initialize()
+    // 将数据源装饰到 fastify 实例上
     fastify.decorate('orm', AppDataSource)
 })
