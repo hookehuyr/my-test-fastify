@@ -1,11 +1,13 @@
 /*
  * @Date: 2025-05-06 23:11:20
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-06 23:11:21
+ * @LastEditTime: 2025-05-07 20:45:38
  * @FilePath: /my-test-fastify/models/Product.js
  * @Description: 文件描述
  */
 'use strict'
+
+const { MoreThanOrEqual, Like, skip, take } = require("typeorm")
 
 /**
  * Product 模型类
@@ -49,8 +51,46 @@ class Product {
      *
      * @returns {Promise<Array>} 商品列表
      */
-    async findAll() {
-        return await this.productRepository.find()
+    async findAll(offset, limit) {
+        // return await this.productRepository.find()
+        // 高级查询测试
+        // 价格大于等于50并且库存大于等于100
+        // return await this.productRepository.find({
+        //     where: {
+        //         price: MoreThanOrEqual(50),
+        //         stock: MoreThanOrEqual(100)
+        //     }
+        // })
+        // 价格大于等于50, 库存大于等于100, 条件是并列
+        // return await this.productRepository.find({
+        //     where: [
+        //         {price: MoreThanOrEqual(50)},
+        //         {stock: MoreThanOrEqual(100)}
+        //     ]
+        // })
+        // 模糊查询
+        // return await this.productRepository.find({
+        //     where: {
+        //         name: Like('%3%')
+        //     }
+        // })
+        // 分页查询
+        // return await this.productRepository.find({
+        //     skip: offset,
+        //     take: limit
+        // })
+        // 高级查询
+        const queryBuilder = this.productRepository.createQueryBuilder('product')
+        queryBuilder
+            .where('product.price > :minPrice', { minPrice: 10 })
+            .andWhere('product.stock > :minStock', { minStock: 10 })
+            .orderBy({
+                'product.price': 'ASC',
+                'product.stock': 'DESC'
+            })
+            .skip(offset)
+            .take(limit);
+        return await queryBuilder.getMany()
     }
 
     /**

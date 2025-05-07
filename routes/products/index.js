@@ -77,11 +77,19 @@ module.exports = async function (fastify, opts) {
                         }
                     }
                 }
+            },
+            query: {
+                type: 'object',
+                properties: {
+                    offset: { type: 'integer', minimum: 0, default: 0 },
+                    limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 }
+                }
             }
         }
     }, async (request, reply) => {
+        const { offset, limit } = request.query
         const productModel = new Product(fastify)
-        const products = await productModel.findAll()
+        const products = await productModel.findAll(offset, limit)
         reply.send(products)
     })
 
