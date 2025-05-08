@@ -1,7 +1,7 @@
 /*
  * @Date: 2025-05-04 22:32:34
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-08 16:40:34
+ * @LastEditTime: 2025-05-08 21:24:27
  * @FilePath: /my-test-fastify/app.js
  * @Description: Fastify应用程序入口文件
  */
@@ -11,7 +11,9 @@ const path = require('node:path')
 const AutoLoad = require('@fastify/autoload')
 
 // 通过命令行参数传递选项来启用这些配置
-const options = {}
+const options = {
+  // ignoreTrailingSlash: true
+}
 
 module.exports = async function (fastify, opts) {
   // 在这里放置你的自定义代码！
