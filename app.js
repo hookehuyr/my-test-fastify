@@ -1,7 +1,7 @@
 /*
  * @Date: 2025-05-04 22:32:34
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-08 00:32:45
+ * @LastEditTime: 2025-05-08 16:40:34
  * @FilePath: /my-test-fastify/app.js
  * @Description: Fastify应用程序入口文件
  */
@@ -19,6 +19,19 @@ module.exports = async function (fastify, opts) {
     // Some code
     request.log.info('±onRequest±')
   })
+
+  // 自定义一个可共享的JSON模式
+  const customSchema = {
+    $id: 'CustomResponse',
+    type: 'object',
+    properties: {
+      message: { type: 'string' },
+      status: { type: 'number' }
+    }
+  };
+
+  // 注册自定义的模式
+  fastify.addSchema(customSchema);
 
   // 请勿修改以下代码行
 

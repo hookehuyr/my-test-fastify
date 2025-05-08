@@ -1,7 +1,7 @@
 /*
  * @Date: 2025-05-04 22:32:34
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-05 00:44:39
+ * @LastEditTime: 2025-05-08 16:21:28
  * @FilePath: /my-test-fastify/plugins/sensible.js
  * @Description: 文件描述
  */
@@ -29,6 +29,7 @@ const fp = require('fastify-plugin')
  */
 module.exports = fp(async function (fastify, opts) {
   fastify.register(require('@fastify/sensible'), {
+    sharedSchemaId: 'HttpError',
     errorHandler: false
   })
 })
