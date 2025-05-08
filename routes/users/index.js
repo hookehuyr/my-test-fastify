@@ -156,8 +156,19 @@ module.exports = async function (fastify, opts) {
      * - 仅返回非敏感用户信息
      * - 验证用户ID的有效性
      */
+
+    // 定义一个 preHandler 函数
+    const myPreHandler = async function(request, reply) {
+        // 使用fastify实例的logger来记录日志
+        request.log.warn('Before handler is running');
+    };
+
     fastify.get('/me', {
+        // 全局钩子, 在请求进入服务器的早期阶段执行
         onRequest: [fastify.authenticate],
+        // 路由特定的钩子，在路由匹配之后、路由处理函数执行之前执行.
+        // preHandler: [firstPreHandler, secondPreHandler]
+        preHandler: myPreHandler,
         schema: {
             tags: ['users'],
             description: '获取当前登录用户信息接口',
@@ -165,6 +176,8 @@ module.exports = async function (fastify, opts) {
     }, async (request, reply) => {
         const userModel = new User(fastify)
         const user = await userModel.findById(request.user.id)
+
+        request.log.warn(user)
 
         if (!user) {
             reply.code(404).send({ error: '用户不存在' })

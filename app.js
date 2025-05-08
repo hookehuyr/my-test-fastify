@@ -1,7 +1,7 @@
 /*
  * @Date: 2025-05-04 22:32:34
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-05 10:23:21
+ * @LastEditTime: 2025-05-08 00:32:45
  * @FilePath: /my-test-fastify/app.js
  * @Description: Fastify应用程序入口文件
  */
@@ -15,6 +15,10 @@ const options = {}
 
 module.exports = async function (fastify, opts) {
   // 在这里放置你的自定义代码！
+  fastify.addHook('onRequest', async (request, reply) => {
+    // Some code
+    request.log.info('±onRequest±')
+  })
 
   // 请勿修改以下代码行
 
