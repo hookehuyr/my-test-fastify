@@ -1,7 +1,7 @@
 /*
  * @Date: 2025-05-04 22:32:34
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-10 00:31:02
+ * @LastEditTime: 2025-05-10 01:29:50
  * @FilePath: /my-test-fastify/routes/example/index.js
  * @Description: 文件描述
  */
@@ -124,4 +124,21 @@ module.exports = async function (fastify, opts) {
     throw err
   });
 
+  // 测试传递一个配置对象,还有鉴权操作相关问题, 权限问题处理
+  fastify.get('/admin', {
+    onRequest: [fastify.authenticate], // 先验证身份
+    config: {
+      role: 'admin'
+    },
+    preHandler: async function (request, reply) {
+      // 检查用户角色
+      if (request.user.role !== reply.routeOptions.config.role) {
+        reply.code(403).send({ error: '需要管理员权限' })
+        return
+      }
+      request.log.info('用户是管理员')
+    }
+  }, async (request, reply) => {
+    return '这是管理员页面'
+  })
 }

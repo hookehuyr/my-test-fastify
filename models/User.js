@@ -1,7 +1,7 @@
 /*
  * @Date: 2025-05-06 23:11:20
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-06 23:11:21
+ * @LastEditTime: 2025-05-10 01:10:45
  * @FilePath: /my-test-fastify/models/User.js
  * @Description: 文件描述
  */
@@ -84,7 +84,7 @@ class User {
     async findById(userId) {
         const user = await this.userRepository.findOne({
             where: { id: userId },
-            select: ['id', 'username', 'email', 'created_at']
+            select: ['id', 'username', 'email', 'created_at', 'role']
         })
 
         return user || null

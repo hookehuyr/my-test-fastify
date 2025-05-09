@@ -1,7 +1,7 @@
 /*
  * @Date: 2025-05-04 23:02:29
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-10 00:35:07
+ * @LastEditTime: 2025-05-10 01:04:35
  * @FilePath: /my-test-fastify/plugins/auth.js
  * @Description: 认证和授权插件，提供JWT身份验证和CORS跨域支持
  */
@@ -123,6 +123,7 @@ module.exports = fp(async function (fastify, opts) {
             await request.jwtVerify()
         } catch (err) {
             // 如果请求头验证失败，检查Authorization头
+            const authHeader = request.headers.authorization
             request.log.warn(authHeader)
             if (authHeader && authHeader.startsWith('Bearer ')) {
                 const token = authHeader.substring(7) // 去掉'Bearer '前缀

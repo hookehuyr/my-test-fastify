@@ -123,7 +123,7 @@ module.exports = async function (fastify, opts) {
         }
 
         // 生成JWT令牌, 包含用户ID和用户名
-        const token = fastify.jwt.sign({ id: user.id, username: user.username })
+        const token = fastify.jwt.sign({ id: user.id, username: user.username, role: user.role })
 
         // 设置cookie并发送响应
         return reply
@@ -175,12 +175,18 @@ module.exports = async function (fastify, opts) {
         schema: {
             tags: ['users'],
             description: '获取当前登录用户信息接口',
+        },
+        config: {
+            output: 'hello world!'
         }
     }, async (request, reply) => {
         const userModel = new User(fastify)
         const user = await userModel.findById(request.user.id)
 
         request.log.warn(user)
+
+        // 测试传递一个配置对象
+        request.log.info(reply.routeOptions.config.output)
 
         if (!user) {
             return reply.code(404).send({ error: '用户不存在' })
