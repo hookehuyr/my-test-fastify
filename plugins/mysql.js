@@ -20,7 +20,7 @@ const mysql = require('@fastify/mysql')
 module.exports = fp(async function (fastify, opts) {
     fastify.register(mysql, {
         promise: true,
-        connectionString: 'mysql://root:huyirui520@localhost:3306/ecommerce'
+        connectionString: `mysql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.PORT}/ecommerce`
     })
 
     /**

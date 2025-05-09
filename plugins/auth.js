@@ -35,7 +35,7 @@ const fp = require('fastify-plugin')
 module.exports = fp(async function (fastify, opts) {
     // 注册cookie插件, 用于处理jwt的token
     await fastify.register(require('@fastify/cookie'), {
-        secret: 'huyirui', // 在生产环境中应该使用环境变量
+        secret: process.env.API_KEY, // 在生产环境中应该使用环境变量
         hook: 'onRequest', // 在每个请求上执行cookie解析
     })
 
@@ -46,7 +46,7 @@ module.exports = fp(async function (fastify, opts) {
      * 在生产环境中，secret应通过环境变量注入，避免硬编码
      */
     await fastify.register(require('@fastify/jwt'), {
-        secret: 'huyirui', // 在生产环境中应该使用环境变量
+        secret: process.env.API_KEY, // 在生产环境中应该使用环境变量
         sign: {
             expiresIn: '1d' // Token有效期为1天
         },

@@ -1,12 +1,13 @@
 /*
  * @Date: 2025-05-04 22:32:34
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-05 10:23:21
+ * @LastEditTime: 2025-05-09 16:23:57
  * @FilePath: /my-test-fastify/app.js
  * @Description: Fastify应用程序入口文件
  */
 'use strict'
 
+require('dotenv').config(); // 加载 .env 文件
 const path = require('node:path')
 const AutoLoad = require('@fastify/autoload')
 
