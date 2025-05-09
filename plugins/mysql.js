@@ -21,10 +21,10 @@ module.exports = fp(async function (fastify, opts) {
     const AppDataSource = new DataSource({
         type: 'mysql',
         host: process.env.DB_HOST,
-        port: 3306,
+        port: process.env.DB_PORT,
         username: process.env.DB_USER,
         password: process.env.DB_PASSWORD,
-        database: 'ecommerce',
+        database: process.env.DB_NAME,
         synchronize: true, // 自动同步数据库结构
         logging: false,
         entities: [
