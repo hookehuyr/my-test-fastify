@@ -29,6 +29,9 @@ importers:
       '@fastify/sensible':
         specifier: ^6.0.0
         version: 6.0.3
+      '@fastify/static':
+        specifier: ^8.1.1
+        version: 8.1.1
       '@fastify/swagger':
         specifier: ^9.5.0
         version: 9.5.0

@@ -1,7 +1,7 @@
 /*
  * @Date: 2025-05-04 22:32:34
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-09 16:55:44
+ * @LastEditTime: 2025-05-09 21:18:11
  * @FilePath: /my-test-fastify/app.js
  * @Description: Fastify应用程序入口文件
  */
@@ -96,6 +96,14 @@ module.exports = async function (fastify, opts) {
   fastify.register(AutoLoad, {
     dir: path.join(__dirname, 'routes'),
     options: Object.assign({ prefix:'/api/v1' }, opts)
+  })
+
+  // 加载public目录中的静态文件
+  fastify.register(require('@fastify/static'), {
+    // root: path.join(__dirname, 'public'),
+    root: path.join(__dirname, 'dist'),
+    prefix: '/', // optional: default '/'
+    // constraints: { host: 'example.com' } // optional: default {}
   })
 }
 

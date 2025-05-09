@@ -61,3 +61,6 @@ profile*
 .trae
 
 .env
+
+public
+dist
