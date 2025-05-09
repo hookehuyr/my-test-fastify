@@ -1,7 +1,7 @@
 /*
  * @Date: 2025-05-04 22:32:34
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-09 16:59:51
+ * @LastEditTime: 2025-05-09 17:31:28
  * @FilePath: /my-test-fastify/routes/root.js
  * @Description: 文件描述
  */
@@ -18,7 +18,8 @@ module.exports = async function (fastify, opts) {
   // 注册GET方法处理根路径('/')的请求
   // 当访问根路径时，返回一个简单的JSON对象，通常用于API健康检查
   fastify.get('/', async function (request, reply) {
-    request.log.info(reply.utility())
+    request.log.info('request', request.utility())
+    request.log.info('reply', reply.utility())
     return { root: true }
   })
 }

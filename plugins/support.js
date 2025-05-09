@@ -1,7 +1,7 @@
 /*
  * @Date: 2025-05-04 22:32:34
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-09 17:01:07
+ * @LastEditTime: 2025-05-09 17:31:03
  * @FilePath: /my-test-fastify/plugins/support.js
  * @Description: 文件描述
  */
@@ -35,6 +35,12 @@ module.exports = fp(async function (fastify, opts) {
 
   // 装饰 fastify.reply 对象
   fastify.decorateReply('utility', function () {
+    // 新功能的代码
+    return 'utility'
+  })
+
+  // 装饰 fastify.request 对象
+  fastify.decorateRequest('utility', function () {
     // 新功能的代码
     return 'utility'
   })
