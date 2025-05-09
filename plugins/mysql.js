@@ -20,10 +20,10 @@ const { DataSource } = require('typeorm')
 module.exports = fp(async function (fastify, opts) {
     const AppDataSource = new DataSource({
         type: 'mysql',
-        host: 'localhost',
+        host: process.env.DB_HOST,
         port: 3306,
-        username: 'root',
-        password: 'huyirui520',
+        username: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
         database: 'ecommerce',
         synchronize: true, // 自动同步数据库结构
         logging: false,
