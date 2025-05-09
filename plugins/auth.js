@@ -1,7 +1,7 @@
 /*
  * @Date: 2025-05-04 23:02:29
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-06 01:26:24
+ * @LastEditTime: 2025-05-09 14:43:55
  * @FilePath: /my-test-fastify/plugins/auth.js
  * @Description: 认证和授权插件，提供JWT身份验证和CORS跨域支持
  */
@@ -37,6 +37,23 @@ module.exports = fp(async function (fastify, opts) {
     await fastify.register(require('@fastify/cookie'), {
         secret: 'huyirui', // 在生产环境中应该使用环境变量
         hook: 'onRequest', // 在每个请求上执行cookie解析
+    })
+
+    // 添加全局onRequest钩子，用于自动注入token到请求头
+    fastify.addHook('onRequest', async (request, reply) => {
+        // 跳过登录和注册路由
+        if (request.routerPath === '/login' || request.routerPath === '/register') return
+
+        // 如果请求头中已经有Authorization，则不需要注入
+        if (request.headers.authorization) return
+
+        // 从cookie中获取token
+        const cookieToken = request.cookies.token
+        if (cookieToken) {
+            // 将token注入到请求头中
+            request.headers.authorization = `Bearer ${cookieToken}`
+        }
+
     })
 
     /**
@@ -105,19 +122,34 @@ module.exports = fp(async function (fastify, opts) {
             // 首先尝试验证请求头中的JWT令牌
             await request.jwtVerify()
         } catch (err) {
-            // 如果请求头验证失败，尝试从cookie中获取token
-            const token = request.cookies.token
-            if (token) {
+            // 如果请求头验证失败，检查Authorization头
+            request.log.warn(authHeader)
+            if (authHeader && authHeader.startsWith('Bearer ')) {
+                const token = authHeader.substring(7) // 去掉'Bearer '前缀
+                try {
+                    // 验证Authorization头中的token
+                    const decoded = await fastify.jwt.verify(token)
+                    request.user = decoded
+                    return // 验证成功，直接返回
+                } catch (authErr) {
+                    // Authorization头中的token无效
+                    reply.code(401).send({ error: '未授权访问' })
+                }
+            }
+
+            // 如果Authorization头验证失败，尝试从cookie中获取token
+            const cookieToken = request.cookies.token
+            if (cookieToken) {
                 try {
                     // 验证cookie中的token并解码用户信息
-                    const decoded = await fastify.jwt.verify(token)
+                    const decoded = await fastify.jwt.verify(cookieToken)
                     request.user = decoded
                 } catch (cookieErr) {
                     // cookie中的token无效或过期
                     reply.code(401).send({ error: '未授权访问' })
                 }
             } else {
-                // 未提供任何认证信息
+                // 未提供任何有效的认证信息
                 reply.code(401).send({ error: '未授权访问' })
             }
         }

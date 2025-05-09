@@ -125,15 +125,18 @@ module.exports = async function (fastify, opts) {
         // 生成JWT令牌, 包含用户ID和用户名
         const token = fastify.jwt.sign({ id: user.id, username: user.username })
 
-        // 设置cookie
-        reply.setCookie('token', token, {
-            path: '/',
-            httpOnly: true, // 防止客户端JavaScript访问
-            secure: process.env.NODE_ENV === 'production', // 在生产环境中只通过HTTPS发送
-            sameSite: 'strict' // 防止CSRF攻击
-        })
-
-        reply.send({ message: '登录成功' })
+        // 设置cookie并发送响应
+        return reply
+            .setCookie('token', token, {
+                path: '/',
+                httpOnly: true, // 防止客户端JavaScript访问
+                secure: process.env.NODE_ENV === 'production', // 在生产环境中只通过HTTPS发送
+                sameSite: 'strict' // 防止CSRF攻击
+            })
+            .send({
+                message: '登录成功',
+                token: token
+            })
     })
 
     /**

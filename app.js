@@ -1,7 +1,7 @@
 /*
  * @Date: 2025-05-04 22:32:34
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-08 23:42:32
+ * @LastEditTime: 2025-05-09 14:42:55
  * @FilePath: /my-test-fastify/app.js
  * @Description: Fastify应用程序入口文件
  */
@@ -22,7 +22,6 @@ module.exports = async function (fastify, opts) {
     request.log.info('onRequest')
     // reply.code(400)
     // throw new Error('Some error')
-    return reply
   })
 
   fastify.addHook('preParsing', async (request, reply, payload) => {
@@ -40,7 +39,6 @@ module.exports = async function (fastify, opts) {
   fastify.addHook('preHandler', async (request, reply) => {
     // 其他代码
     request.log.info('preHandler');
-    return reply
   })
   // 序列化前处理, 也就是发送到客户端之前
   fastify.addHook('preSerialization', async (request, reply, payload) => {
