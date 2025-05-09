@@ -6,6 +6,12 @@
   "directories": {
     "test": "test"
   },
+  "_moduleAliases": {
+    "@entities": "entities",
+    "@plugins": "plugins",
+    "@models": "models",
+    "@routes": "routes"
+  },
   "scripts": {
     "test": "node --test test/**/*.test.js",
     "start": "fastify start -l info app.js",
@@ -32,6 +38,7 @@
     "fastify": "^5.0.0",
     "fastify-cli": "^7.4.0",
     "fastify-plugin": "^5.0.0",
+    "module-alias": "^2.2.3",
     "mysql2": "^3.14.1",
     "reflect-metadata": "^0.2.2",
     "typeorm": "^0.3.22"

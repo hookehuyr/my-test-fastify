@@ -21,18 +21,18 @@ module.exports = fp(async function (fastify, opts) {
     const AppDataSource = new DataSource({
         type: 'mysql',
         host: process.env.DB_HOST,
-        port: process.env.DB_PORT,
+        port: parseInt(process.env.DB_PORT || '3306'),
         username: process.env.DB_USER,
         password: process.env.DB_PASSWORD,
         database: process.env.DB_NAME,
         synchronize: true, // 自动同步数据库结构
         logging: false,
         entities: [
-            require('../entities/Product'),
-            require('../entities/Order'),
-            require('../entities/OrderItem'),
-            require('../entities/CartItem'),
-            require('../entities/User')
+            require('@entities/Product'),
+            require('@entities/Order'),
+            require('@entities/OrderItem'),
+            require('@entities/CartItem'),
+            require('@entities/User')
         ]
     })
 

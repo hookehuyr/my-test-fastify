@@ -59,6 +59,9 @@ importers:
       fastify-plugin:
         specifier: ^5.0.0
         version: 5.0.1
+      module-alias:
+        specifier: ^2.2.3
+        version: 2.2.3
       mysql2:
         specifier: ^3.14.1
         version: 3.14.1
@@ -777,6 +780,9 @@ packages:
 
   mnemonist@0.40.3:
     resolution: {integrity: sha512-Vjyr90sJ23CKKH/qPAgUKicw/v6pRoamxIEDFOF8uSgFME7DqPRpHgRTejWVjkdGg5dXj0/NyxZHZ9bcjH+2uQ==}
+
+  module-alias@2.2.3:
+    resolution: {integrity: sha512-23g5BFj4zdQL/b6tor7Ji+QY4pEfNH784BMslY9Qb0UnJWRAt+lQGLYmRaM0KDBwIG23ffEBELhZDP2rhi9f/Q==}
 
   ms@2.0.0:
     resolution: {integrity: sha512-Tpp60P6IUJDTuOq/5Z8cdskzJujfwqfOTkrwIwj7IRISpnkJnT6SyJ4PCPnGMoFjC9ddhal5KVIYtAt97ix05A==}
@@ -2065,6 +2071,8 @@ snapshots:
   mnemonist@0.40.3:
     dependencies:
       obliterator: 2.0.5
+
+  module-alias@2.2.3: {}
 
   ms@2.0.0: {}
 
