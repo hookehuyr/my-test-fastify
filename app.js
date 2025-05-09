@@ -1,7 +1,7 @@
 /*
  * @Date: 2025-05-04 22:32:34
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-09 21:18:11
+ * @LastEditTime: 2025-05-09 22:02:57
  * @FilePath: /my-test-fastify/app.js
  * @Description: Fastify应用程序入口文件
  */
@@ -14,7 +14,27 @@ const AutoLoad = require('@fastify/autoload')
 
 // 通过命令行参数传递选项来启用这些配置
 const options = {
-  // ignoreTrailingSlash: true
+  // ignoreTrailingSlash: true,
+  // logger: {
+  //   serializers: {
+  //     res (reply) {
+  //       // 默认
+  //       return {
+  //         statusCode: reply.statusCode
+  //       }
+  //     },
+  //     req (request) {
+  //       return {
+  //         method: request.method,
+  //         url: request.url,
+  //         path: request.path,
+  //         parameters: request.parameters,
+  //         // 记录 header 可能会触犯隐私法律，例如 GDPR (译注：General Data Protection Regulation)。你应该用 "redact" 选项来移除敏感的字段。此外，验证数据也可能在日志中泄露。
+  //         // headers: request.headers
+  //       };
+  //     }
+  //   }
+  // }
 }
 
 module.exports = async function (fastify, opts) {
@@ -98,10 +118,10 @@ module.exports = async function (fastify, opts) {
     options: Object.assign({ prefix:'/api/v1' }, opts)
   })
 
-  // 加载public目录中的静态文件
+  // 加载目录中的静态文件
   fastify.register(require('@fastify/static'), {
     // root: path.join(__dirname, 'public'),
-    root: path.join(__dirname, 'dist'),
+    root: path.join(__dirname, 'dist'), // dist 目录是 vite 打包后的文件
     prefix: '/', // optional: default '/'
     // constraints: { host: 'example.com' } // optional: default {}
   })
