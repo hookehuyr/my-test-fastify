@@ -183,9 +183,8 @@ module.exports = async function (fastify, opts) {
         request.log.warn(user)
 
         if (!user) {
-            reply.code(404).send({ error: '用户不存在' })
-            return
+            return reply.code(404).send({ error: '用户不存在' })
         }
-        reply.send(user)
+        return reply.send(user)
     })
 }
