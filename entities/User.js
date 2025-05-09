@@ -1,7 +1,7 @@
 /*
  * @Date: 2025-05-07 14:09:24
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-07 15:32:59
+ * @LastEditTime: 2025-05-10 00:03:04
  * @FilePath: /my-test-fastify/entities/User.js
  * @Description: 文件描述
  */
@@ -39,6 +39,11 @@ module.exports = new EntitySchema({
         created_at: {
             type: 'timestamp',
             default: () => 'CURRENT_TIMESTAMP'
+        },
+        role: {
+            type: 'enum',
+            enum: ['user', 'admin', 'guest'],
+            default: 'user'
         }
     },
     relations: { // 定义实体之间的关系

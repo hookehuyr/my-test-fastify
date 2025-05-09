@@ -1,7 +1,7 @@
 /*
  * @Date: 2025-05-04 23:02:29
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-09 16:17:56
+ * @LastEditTime: 2025-05-10 00:35:07
  * @FilePath: /my-test-fastify/plugins/auth.js
  * @Description: 认证和授权插件，提供JWT身份验证和CORS跨域支持
  */
@@ -129,6 +129,9 @@ module.exports = fp(async function (fastify, opts) {
                 try {
                     // 验证Authorization头中的token
                     const decoded = await fastify.jwt.verify(token)
+                    // 将解码后的用户信息添加到request.user中
+                    // 这使得后续的路由处理程序可以直接访问用户信息
+                    // 这是路由级别的访问控制, 只有使用这个装饰器的路由才能访问这个属性
                     request.user = decoded
                     return // 验证成功，直接返回
                 } catch (authErr) {

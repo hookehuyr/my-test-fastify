@@ -1,7 +1,7 @@
 /*
  * @Date: 2025-05-04 22:32:34
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-08 16:58:48
+ * @LastEditTime: 2025-05-10 00:31:02
  * @FilePath: /my-test-fastify/routes/example/index.js
  * @Description: 文件描述
  */
@@ -22,6 +22,8 @@ module.exports = async function (fastify, opts) {
       }
     }
   }, async function (request, reply) {
+    // 验证路由级别的访问限制
+    request.log.info('request-user', request.user)
     return 'this is an example'
   })
 
@@ -120,5 +122,6 @@ module.exports = async function (fastify, opts) {
     // 抛出自定义错误
     const err = fastify.httpErrors.createError(404, '这个视频不存在！')
     throw err
-  })
+  });
+
 }
