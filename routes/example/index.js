@@ -1,7 +1,7 @@
 /*
  * @Date: 2025-05-04 22:32:34
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-10 01:29:50
+ * @LastEditTime: 2025-05-10 13:45:28
  * @FilePath: /my-test-fastify/routes/example/index.js
  * @Description: 文件描述
  */
@@ -96,21 +96,29 @@ module.exports = async function (fastify, opts) {
   //   }
   // })
 
-  // fastify.get('/custom-schema', {
-  //   schema: {
-  //     response: {
-  //       200: { $ref: 'CustomResponse' }
-  //     }
-  //   }
-  // }, async (req, reply) => {
-  //   // 动态生成响应对象
-  //   const response = {
-  //     message: 'This is a custom response',
-  //     status: 200
-  //   };
+  // 测试自定义 schema, 共享 schema 模式
+  fastify.post('/custom-schema', {
+    schema: {
+      body: { $ref: 'userWithPassword#' },
+      response: {
+        // 200: { $ref: 'CustomResponse' }
+        200: { $ref: 'user#' }
+      }
+    }
+  }, async (req, reply) => {
+    // 动态生成响应对象
+    // const response = {
+    //   message: 'This is a custom response',
+    //   status: 200
+    // };
+    const response = {
+      username: 'This is a custom response',
+      email: '1@1.com',
+      status: 200
+    };
 
-  //   return reply.code(200).send(response)
-  // });
+    return reply.code(200).send(response)
+  });
 
   fastify.get('/custom-error', {
     // schema: {

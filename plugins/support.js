@@ -1,7 +1,7 @@
 /*
  * @Date: 2025-05-04 22:32:34
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-10 11:15:42
+ * @LastEditTime: 2025-05-10 13:33:42
  * @FilePath: /my-test-fastify/plugins/support.js
  * @Description: 文件描述
  */
@@ -44,4 +44,28 @@ module.exports = fp(async function (fastify, opts) {
     // 新功能的代码
     return 'request-utility'
   })
+
+  // 注册基础 schema
+  fastify.addSchema({
+    $id: 'user',
+    type: 'object',
+    properties: {
+      username: { type: 'string' },
+      email: { type: 'string', format: 'email' }
+    }
+  });
+
+  // 注册扩展 schema（复用 user 并添加 password）
+  fastify.addSchema({
+    $id: 'userWithPassword',
+    allOf: [
+      { $ref: 'user#' },
+      {
+        type: 'object',
+        properties: {
+          password: { type: 'string', minLength: 8 }
+        }
+      }
+    ]
+  });
 })
