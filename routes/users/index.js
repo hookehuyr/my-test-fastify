@@ -25,6 +25,7 @@
 
 const path = require('path')
 const User = require(path.join(__dirname, '../../models/User'))
+const S = require('fluent-json-schema')
 
 module.exports = async function (fastify, opts) {
     /**
@@ -80,6 +81,20 @@ module.exports = async function (fastify, opts) {
     })
 
     /**
+     * 定义一个JSON Schema, 用于验证请求体的结构
+     * 使用fluent-json-schema库来定义JSON Schema
+     * @type {Object}
+     * 仅选择您想要保留的属性
+     * const loginSchema = userSchema.only(['username', 'password'])
+     * 删除您不想保留的属性
+     * const bodySchema = personSchema.without(['createdAt', 'updatedAt'])
+     */
+    const bodyJsonSchema = S.object()
+    .prop('username', S.string().minLength(3).required())
+    .prop('password', S.string().minLength(6).required())
+    .valueOf()
+
+    /**
      * 用户登录接口
      *
      * 该接口处理用户登录请求，执行以下操作：
@@ -103,14 +118,15 @@ module.exports = async function (fastify, opts) {
         schema: {
             tags: ['users'],
             description: '用户登录接口',
-            body: {
-                type: 'object',
-                required: ['username', 'password'],
-                properties: {
-                    username: { type: 'string' },
-                    password: { type: 'string' }
-                }
-            }
+            // body: {
+            //     type: 'object',
+            //     required: ['username', 'password'],
+            //     properties: {
+            //         username: { type: 'string' },
+            //         password: { type: 'string' }
+            //     }
+            // }
+            body: bodyJsonSchema
         }
     }, async (request, reply) => {
         const { username, password } = request.body

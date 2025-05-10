@@ -62,6 +62,9 @@ importers:
       fastify-plugin:
         specifier: ^5.0.0
         version: 5.0.1
+      fluent-json-schema:
+        specifier: ^6.0.0
+        version: 6.0.0
       module-alias:
         specifier: ^2.2.3
         version: 2.2.3
@@ -101,6 +104,9 @@ packages:
 
   '@fastify/deepmerge@2.0.2':
     resolution: {integrity: sha512-3wuLdX5iiiYeZWP6bQrjqhrcvBIf0NHbQH1Ur1WbHvoiuTYUEItgygea3zs8aHpiitn0lOB8gX20u1qO+FDm7Q==}
+
+  '@fastify/deepmerge@3.1.0':
+    resolution: {integrity: sha512-lCVONBQINyNhM6LLezB6+2afusgEYR4G8xenMsfe+AT+iZ7Ca6upM5Ha8UkZuYSnuMw3GWl/BiPXnLMi/gSxuQ==}
 
   '@fastify/error@4.1.0':
     resolution: {integrity: sha512-KeFcciOr1eo/YvIXHP65S94jfEEqn1RxTRBT1aJaHxY5FK0/GDXYozsQMMWlZoHgi8i0s+YtrLsgj/JkUUjSkQ==}
@@ -522,6 +528,9 @@ packages:
   find-up@3.0.0:
     resolution: {integrity: sha512-1yD6RmLI1XBfxugvORwlck6f75tYL+iR0jqwsOrOxMZyGYqUuDhJ0l4AXdO1iX/FTs9cBAMEk1gWSEx1kSbylg==}
     engines: {node: '>=6'}
+
+  fluent-json-schema@6.0.0:
+    resolution: {integrity: sha512-6AEL/74vC5MB7MVK8NQrNcIol7tAlbuKwjvYVXPSIlIhgvT+4EhzFi6FWijbDjnyDKgDfKY/yHIjD1Gm6PF8Uw==}
 
   foreground-child@3.3.1:
     resolution: {integrity: sha512-gIXjKqtFuWEgzFRJA9WCQeSJLZDjgJUOMCMzxtvFq/37KojM1BFGufqsCy0r4qSQmYLsZYMeyRqzIWOMup03sw==}
@@ -1307,6 +1316,8 @@ snapshots:
 
   '@fastify/deepmerge@2.0.2': {}
 
+  '@fastify/deepmerge@3.1.0': {}
+
   '@fastify/error@4.1.0': {}
 
   '@fastify/express@4.0.2':
@@ -1819,6 +1830,10 @@ snapshots:
   find-up@3.0.0:
     dependencies:
       locate-path: 3.0.0
+
+  fluent-json-schema@6.0.0:
+    dependencies:
+      '@fastify/deepmerge': 3.1.0
 
   foreground-child@3.3.1:
     dependencies:

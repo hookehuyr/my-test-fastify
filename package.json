@@ -39,6 +39,7 @@
     "fastify": "^5.0.0",
     "fastify-cli": "^7.4.0",
     "fastify-plugin": "^5.0.0",
+    "fluent-json-schema": "^6.0.0",
     "module-alias": "^2.2.3",
     "mysql2": "^3.14.1",
     "reflect-metadata": "^0.2.2",

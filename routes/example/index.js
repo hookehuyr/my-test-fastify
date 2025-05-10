@@ -1,7 +1,7 @@
 /*
  * @Date: 2025-05-04 22:32:34
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-10 13:45:28
+ * @LastEditTime: 2025-05-10 13:59:59
  * @FilePath: /my-test-fastify/routes/example/index.js
  * @Description: 文件描述
  */
@@ -98,6 +98,12 @@ module.exports = async function (fastify, opts) {
 
   // 测试自定义 schema, 共享 schema 模式
   fastify.post('/custom-schema', {
+    // onRequest: function (request, reply, done) {
+    //   // 处理请求之前的逻辑
+    //   const mySchema = fastify.getSchema('userWithPassword')
+    //   console.warn(mySchema);
+    //   done()
+    // },
     schema: {
       body: { $ref: 'userWithPassword#' },
       response: {
