@@ -24,6 +24,7 @@ module.exports = async function (fastify, opts) {
   }, async function (request, reply) {
     // 验证路由级别的访问限制
     request.log.info('request-user', request.user)
+    request.log.info(reply.utility())
     return 'this is an example'
   })
 

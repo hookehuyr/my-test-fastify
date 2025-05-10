@@ -1,7 +1,7 @@
 /*
  * @Date: 2025-05-04 22:32:34
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-09 22:02:57
+ * @LastEditTime: 2025-05-10 10:59:24
  * @FilePath: /my-test-fastify/app.js
  * @Description: Fastify应用程序入口文件
  */
@@ -39,11 +39,13 @@ const options = {
 
 module.exports = async function (fastify, opts) {
   // 在这里放置你的自定义代码！
+  // 在Fastify应用程序中，钩子（hooks）需要在注册插件和路由之前定义，这样它们才能对所有后续的请求生效
   // fastify.addHook('onRequest', async (request, reply) => {
   //   // Some code
   //   request.log.info('onRequest')
   //   // reply.code(400)
   //   // throw new Error('Some error')
+  //   request.log.info(fastify.someSupport())
   // })
 
   // fastify.addHook('preParsing', async (request, reply, payload) => {
