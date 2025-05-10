@@ -1,7 +1,7 @@
 /*
  * @Date: 2025-05-04 22:32:34
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-10 10:59:24
+ * @LastEditTime: 2025-05-11 00:45:18
  * @FilePath: /my-test-fastify/app.js
  * @Description: Fastify应用程序入口文件
  */
@@ -10,31 +10,56 @@
 require('dotenv').config(); // 加载 .env 文件
 require('module-alias/register'); // 注册路径别名
 const path = require('node:path')
+const fs = require('node:fs')
 const AutoLoad = require('@fastify/autoload')
+const pino = require('pino') // 导入pino日志库
 
-// 通过命令行参数传递选项来启用这些配置
+// 确保日志目录存在并检查写入权限
+const logDir = path.join(__dirname, 'logs')
+if (!fs.existsSync(logDir)) {
+  fs.mkdirSync(logDir, { recursive: true })
+}
+
+// 检查日志目录的写入权限
+try {
+  const testFile = path.join(logDir, '.write-test')
+  fs.writeFileSync(testFile, '')
+  fs.unlinkSync(testFile)
+} catch (error) {
+  console.error('错误：无法写入日志目录，请检查目录权限：', error.message)
+  process.exit(1)
+}
+
+// TODO: 不知道原因始终写不进去日志
+// 配置日志实例
+const logger = pino.multistream([
+  // 控制台输出（带美化）
+  {
+    level: 'info',
+    stream: pino.transport({
+      target: 'pino-pretty',
+      options: {
+        colorize: true,
+        translateTime: 'HH:MM:ss Z',
+        ignore: 'pid,hostname'
+      }
+    })
+  },
+  // 文件输出，按日期轮转
+  {
+    level: 'info',
+    stream: pino.destination({
+      dest: path.join(logDir, `app-${new Date().toISOString().split('T')[0]}.log`),
+      sync: false,
+      mkdir: true
+    })
+  }
+])
+
+// 应用配置选项
 const options = {
   // ignoreTrailingSlash: true,
-  // logger: {
-  //   serializers: {
-  //     res (reply) {
-  //       // 默认
-  //       return {
-  //         statusCode: reply.statusCode
-  //       }
-  //     },
-  //     req (request) {
-  //       return {
-  //         method: request.method,
-  //         url: request.url,
-  //         path: request.path,
-  //         parameters: request.parameters,
-  //         // 记录 header 可能会触犯隐私法律，例如 GDPR (译注：General Data Protection Regulation)。你应该用 "redact" 选项来移除敏感的字段。此外，验证数据也可能在日志中泄露。
-  //         // headers: request.headers
-  //       };
-  //     }
-  //   }
-  // }
+  logger: logger
 }
 
 module.exports = async function (fastify, opts) {
