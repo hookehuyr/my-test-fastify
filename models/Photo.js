@@ -1,7 +1,7 @@
 /*
  * @Date: 2025-05-11 22:14:41
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-12 00:10:16
+ * @LastEditTime: 2025-05-12 00:33:40
  * @FilePath: /my-test-fastify/models/Photo.js
  * @Description: 文件描述
  */
@@ -51,8 +51,23 @@ class Photo {
     return await this.photoRepository.findBy(query)
   }
 
-  async findAndCount() {
-    return await this.photoRepository.findAndCount()
+  /**
+   * 获取照片列表和总数（支持分页和排序）
+   * @param {Object} options 查询选项
+   * @param {number} options.skip 跳过的记录数
+   * @param {number} options.take 获取的记录数
+   * @param {Object} options.order 排序选项
+   * @returns {Promise<[Photo[], number]>} 返回照片列表和总数
+   */
+  async findAndCount(options = {}) {
+    const { skip, take, order = 'DESC' } = options
+    return await this.photoRepository.findAndCount({
+      skip,
+      take,
+      order: {
+        id: order
+      }
+    })
   }
 }
 
