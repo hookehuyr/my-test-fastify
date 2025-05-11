@@ -25,9 +25,10 @@ module.exports = fp(async function (fastify, opts) {
         username: process.env.DB_USER,
         password: process.env.DB_PASSWORD,
         database: process.env.DB_NAME,
-        synchronize: true, // 自动同步数据库结构
+        synchronize: process.env.NODE_ENV === 'development' ? true : false, // 自动同步数据库结构
         logging: false,
         entities: [
+            require('@entities/Photo'),
             require('@entities/Product'),
             require('@entities/Order'),
             require('@entities/OrderItem'),
