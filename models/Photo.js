@@ -1,7 +1,7 @@
 /*
  * @Date: 2025-05-11 22:14:41
  * @LastEditors: hookehuyr hookehuyr@gmail.com
- * @LastEditTime: 2025-05-12 00:33:40
+ * @LastEditTime: 2025-05-12 20:33:55
  * @FilePath: /my-test-fastify/models/Photo.js
  * @Description: 文件描述
  */
@@ -68,6 +68,16 @@ class Photo {
         id: order
       }
     })
+  }
+
+  async updatePhotoById(id, photoData) {
+    const result = await this.photoRepository.update(id, photoData)
+    return result.affected > 0
+  }
+
+  async deletePhotoById(id) {
+    const result = await this.photoRepository.delete(id)
+    return result.affected > 0
   }
 }
 

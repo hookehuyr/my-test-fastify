@@ -228,4 +228,67 @@ module.exports = async function (fastify, opts) {
       })
     }
   })
+
+  fastify.put('/update/:id', {
+    schema: {
+      tags: ['photo'],
+      summary: '更新照片',
+      description: '通过ID更新照片信息',
+      params: S.object()
+        .prop('id', S.number().minimum(1))
+        .valueOf(),
+      body: S.object()
+        .prop('views', S.number())
+        .prop('isPublished', S.boolean())
+        .valueOf()
+    }
+  }, async function (request, reply) {
+    try {
+      const { id } = request.params
+      const { views, isPublished } = request.body
+      const photoModel = new Photo(fastify)
+      const photo = await photoModel.updatePhotoById({ id }, { views, isPublished })
+      if (!photo) {
+        return reply.status(404).send({
+          status: 'error',
+          message: '照片不存在'
+        })
+      }
+      return reply.send({
+        status:'success',
+        message: '更新成功',
+      })
+    } catch (error) {
+      return handleError(error, reply)
+    }
+  })
+
+  fastify.delete('/delete/:id', {
+    schema: {
+      tags: ['photo'],
+      summary: '删除照片',
+      description: '通过ID删除照片',
+      params: S.object()
+        .prop('id', S.number().minimum(1))
+        .valueOf()
+    }
+  }, async function (request, reply) {
+    try {
+      const { id } = request.params
+      const photoModel = new Photo(fastify)
+      const photo = await photoModel.deletePhotoById(id)
+      if (!photo) {
+        return reply.status(404).send({
+          status: 'error',
+          message: '照片不存在'
+        })
+      }
+      return reply.send({
+        status:'success',
+        message: '删除成功',
+      })
+    } catch (error) {
+      return handleError(error, reply)
+    }
+  })
 }
