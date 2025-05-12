@@ -33,7 +33,8 @@ module.exports = fp(async function (fastify, opts) {
             require('@entities/Order'),
             require('@entities/OrderItem'),
             require('@entities/CartItem'),
-            require('@entities/User')
+            require('@entities/User'),
+            require('@entities/PhotoMetadata')
         ]
     })
 

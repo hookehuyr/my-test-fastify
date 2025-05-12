@@ -3,6 +3,7 @@
 const path = require('path')
 const Photo = require(path.join(__dirname, '../../models/Photo'))
 const S = require('fluent-json-schema')
+const PhotoMetadata = require(path.join(__dirname, '../../models/PhotoMetadata'))
 
 // 定义分页查询的Schema
 const paginationSchema = S.object()
@@ -255,7 +256,7 @@ module.exports = async function (fastify, opts) {
         })
       }
       return reply.send({
-        status:'success',
+        status: 'success',
         message: '更新成功',
       })
     } catch (error) {
@@ -284,8 +285,100 @@ module.exports = async function (fastify, opts) {
         })
       }
       return reply.send({
-        status:'success',
+        status: 'success',
         message: '删除成功',
+      })
+    } catch (error) {
+      return handleError(error, reply)
+    }
+  })
+
+  // 创建并关联照片元数据接口
+  fastify.post('/:photoId/metadata', {
+    schema: {
+      tags: ['photo'],
+      summary: '为指定照片创建元数据',
+      description: '根据照片ID创建并关联元数据',
+      params: S.object()
+        .prop('photoId', S.number().minimum(1))
+        .valueOf(),
+      body: S.object()
+        .prop('height', S.number().minimum(0))
+        .prop('width', S.number().minimum(0))
+        .prop('orientation', S.number())
+        .prop('compressed', S.boolean())
+        .required(['height', 'width', 'orientation', 'compressed'])
+        .valueOf(),
+      response: {
+        201: S.object()
+          .prop('status', S.string())
+          .prop('message', S.string())
+          .prop('data', S.object()
+            .prop('id', S.number())
+            .prop('height', S.number())
+            .prop('width', S.number())
+            .prop('orientation', S.number())
+            .prop('compressed', S.boolean())
+            .prop('photo', S.anyOf([S.object(), S.null()]))
+          )
+      }
+    }
+  }, async function (request, reply) {
+    /**
+     * 为指定照片创建元数据并建立关联
+     * @param {Object} request Fastify请求对象
+     * @param {Object} reply Fastify响应对象
+     */
+    try {
+      const { photoId } = request.params
+      const metadataData = request.body
+      const photoModel = new Photo(fastify)
+      const metadataModel = new PhotoMetadata(fastify)
+      // 检查照片是否存在
+      const photo = await photoModel.findOneBy({ id: photoId })
+      if (!photo) {
+        return reply.status(404).send({
+          status: 'error',
+          message: '照片不存在'
+        })
+      }
+      // 创建元数据并关联photo, 实体的定义了个关系字段photo, 和查出来的photo关联到一起
+      const metadata = await metadataModel.create({ ...metadataData, photo })
+      return reply.status(201).send({
+        status: 'success',
+        message: '元数据创建并关联成功',
+        data: metadata
+      })
+    } catch (error) {
+      return handleError(error, reply)
+    }
+  })
+
+  // 获取指定照片的元数据接口
+  fastify.get('/:photoId/metadata', {
+    schema: {
+      tags: ['photo'],
+      summary: '获取指定照片的元数据',
+      description: '根据照片ID获取元数据',
+      params: S.object()
+        .prop('photoId', S.number().minimum(1))
+        .valueOf()
+    }
+  }, async function (request, reply) {
+    try {
+      const { photoId } = request.params
+      const photoModel = new Photo(fastify)
+      const { metadata } = await photoModel.findOneMetadataByPhotoId(photoId)
+      if (!metadata) {
+        return reply.status(404).send({
+          status: 'error',
+          message: '元数据不存在'
+        })
+      }
+      return reply.send({
+        status:'success',
+        message: '获取成功',
+        data: metadata
       })
     } catch (error) {
       return handleError(error, reply)
